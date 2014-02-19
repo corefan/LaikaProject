@@ -27,6 +27,11 @@ namespace Laika.Database.MySqlDB
             InitializeConnection();
         }
 
+        ~DatabaseForMySql()
+        {
+            Dispose(false);
+        }
+
         private void InitializeConnection()
         {
             MySqlConnection conn = new MySqlConnection(ConnectionStringBuilder.ToString());

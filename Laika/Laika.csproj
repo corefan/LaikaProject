@@ -48,6 +48,7 @@
     <Compile Include="Database\MySql\IDBJob.cs" />
     <Compile Include="Database\MySql\MySQLJob.cs" />
     <Compile Include="Database\MySql\TransactionConext.cs" />
+    <Compile Include="Database\ThreadPool\AppDomainThreadPoolManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
