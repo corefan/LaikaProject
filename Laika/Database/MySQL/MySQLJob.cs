@@ -6,6 +6,9 @@ using MySql.Data.MySqlClient;
 
 namespace Laika.Database.MySqlDB
 {
+    /// <summary>
+    /// Job 클래스
+    /// </summary>
     public class MySqlJob : IDBJob
     {
         public delegate void JobDelegate(MySqlConnection connection);
@@ -17,12 +20,23 @@ namespace Laika.Database.MySqlDB
 
         public delegate void TransactionJobDelegate(TransactionConext transactionContext);
 
-
+        /// <summary>
+        /// 일반 쿼리 job 생성
+        /// </summary>
+        /// <param name="job">job 람다 메소드</param>
+        /// <param name="ex">예외 처리 람다 메소드</param>
+        /// <returns></returns>
         public static MySqlJob CreateMySQLJob(MySqlJob.JobDelegate job, ExceptionJobDelegate ex = null)
         {
             return new MySqlJob(job, ex);
         }
 
+        /// <summary>
+        /// Transaction job 생성
+        /// </summary>
+        /// <param name="job">job 람다 메소드</param>
+        /// <param name="ex">예외처리 람다 메소드</param>
+        /// <returns></returns>
         public static MySqlJob CreateMySQLTransactionJob(MySqlJob.TransactionJobDelegate job, ExceptionJobDelegate ex = null)
         {
             return new MySqlJob(job, ex);

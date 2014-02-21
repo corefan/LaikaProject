@@ -7,8 +7,21 @@ using MySql.Data.MySqlClient;
 
 namespace Laika.Database.MySqlDB
 {
+    /// <summary>
+    /// MySql 연결 및 작업 수행 객체입니다.
+    /// </summary>
     public class DatabaseForMySql : IDatabase
     {
+        /// <summary>
+        /// DatabasaeForMySql 생성자
+        /// </summary>
+        /// <param name="host">서버</param>
+        /// <param name="port">포트</param>
+        /// <param name="user">사용자 ID</param>
+        /// <param name="password">패스워드</param>
+        /// <param name="database">DB명</param>
+        /// <param name="minPool">최소 연결 개수</param>
+        /// <param name="maxPool">최대 연결 개수</param>
         public DatabaseForMySql(string host, uint port, string user, string password, string database, uint minPool, uint maxPool)
         {
             if (minPool < 1 || maxPool < 1 || minPool > maxPool)
@@ -39,6 +52,11 @@ namespace Laika.Database.MySqlDB
             conn.Dispose();
         }
 
+        /// <summary>
+        /// DB job 수행 메소드
+        /// </summary>
+        /// <param name="job">job 객체</param>
+        /// <returns>job은 비동기로 작업을 하며, Task를 return 합니다.</returns>
         public Task DoJob(IDBJob job)
         {
             if (job.QueryJob != null)

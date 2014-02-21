@@ -6,8 +6,15 @@ using MySql.Data.MySqlClient;
 
 namespace Laika.Database.MySqlDB
 {
+    /// <summary>
+    /// Transaction 관리 클래스
+    /// </summary>
     public class TransactionConext
     {
+        /// <summary>
+        /// Transaction 관리 인스턴스 생성
+        /// </summary>
+        /// <param name="c"></param>
         public TransactionConext(MySqlConnection c)
         {
             connection = c;
@@ -15,6 +22,11 @@ namespace Laika.Database.MySqlDB
             Transaction = c.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
         }
 
+        /// <summary>
+        /// MySqlCommand 생성
+        /// </summary>
+        /// <param name="query">수행될 쿼리</param>
+        /// <returns>MySqlCommand 인스턴스</returns>
         public MySqlCommand CreateMySqlCommand(string query)
         {
             var command = connection.CreateCommand();

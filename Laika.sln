@@ -5,6 +5,15 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laika", "Laika\Laika.csproj", "{5B17F254-F40A-4069-908D-339E67B9482E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "ConsoleApplication1\TestProject.csproj", "{89517BE7-DF94-45E6-BD8B-AEF602ACB8D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{05A5C2A4-DC23-4E8B-8139-B626E5C1CFAB}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +24,10 @@ Global
 		{5B17F254-F40A-4069-908D-339E67B9482E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B17F254-F40A-4069-908D-339E67B9482E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B17F254-F40A-4069-908D-339E67B9482E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89517BE7-DF94-45E6-BD8B-AEF602ACB8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89517BE7-DF94-45E6-BD8B-AEF602ACB8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89517BE7-DF94-45E6-BD8B-AEF602ACB8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89517BE7-DF94-45E6-BD8B-AEF602ACB8D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
