@@ -16,6 +16,6 @@ namespace Laika.Database.MySqlDB
         /// </summary>
         /// <param name="job">job 객체</param>
         /// <returns>job은 비동기로 작업을 하며, Task를 return 합니다.</returns>
-        Task DoJob(IDBJob job);
+        Task DoJobAsync(IDBJob job);
     }
 }

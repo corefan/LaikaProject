@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Laika.ThreadPool
+namespace Laika.ThreadPoolManager
 {
     public class AppDomainThreadPoolManager
     {
@@ -16,6 +16,9 @@ namespace Laika.ThreadPool
         public static void SetMinThreadPool(int minWorkerThreads, int minCompletionPortThreads)
         {
             System.Threading.ThreadPool.SetMinThreads(minWorkerThreads, minCompletionPortThreads);
+            IsSetMinThreadPool = true;
         }
+
+        public static bool IsSetMinThreadPool { get; private set; }
     }
 }

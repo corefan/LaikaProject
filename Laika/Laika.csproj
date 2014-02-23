@@ -56,6 +56,13 @@
     <Compile Include="ExtendBundle\ExtendArray.cs" />
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
+    <Compile Include="Net\Acceptor.cs" />
+    <Compile Include="Net\Body\IBody.cs" />
+    <Compile Include="Net\Header\IHeader.cs" />
+    <Compile Include="Net\Message\IMessage.cs" />
+    <Compile Include="Net\LaikaTcpServer.cs" />
+    <Compile Include="Net\Receiver.cs" />
+    <Compile Include="Net\Sender.cs" />
     <Compile Include="ThreadPool\AppDomainThreadPoolManager.cs" />
     <Compile Include="Log\FileLog.cs" />
     <Compile Include="Log\FileLogFactory.cs" />

@@ -38,6 +38,16 @@ namespace Laika.Database.MySqlDB
             ConnectionStringBuilder.MaximumPoolSize = maxPool;
 
             InitializeConnection();
+
+            SetPool((int)((maxPool + minPool) / 2));
+        }
+
+        private void SetPool(int size)
+        {
+            if (Laika.ThreadPoolManager.AppDomainThreadPoolManager.IsSetMinThreadPool == false)
+            {
+                Laika.ThreadPoolManager.AppDomainThreadPoolManager.SetMinThreadPool(size, size);
+            }
         }
 
         ~DatabaseForMySql()
@@ -53,75 +63,103 @@ namespace Laika.Database.MySqlDB
         }
 
         /// <summary>
-        /// DB job 수행 메소드
+        /// DB job 수행 비동기 메소드
         /// </summary>
         /// <param name="job">job 객체</param>
         /// <returns>job은 비동기로 작업을 하며, Task를 return 합니다.</returns>
-        public Task DoJob(IDBJob job)
+        public Task DoJobAsync(IDBJob job)
         {
             if (job.QueryJob != null)
             {
-                return NormalQueryJob(job);
+                return NormalQueryJobAsync(job);
             }
 
             if (job.TransactionQueryJob != null)
             {
-                return TransactionQueryJob(job);
+                return TransactionQueryJobAsync(job);
             }
             
             return null;
         }
 
-        private Task TransactionQueryJob(IDBJob job)
+        /// <summary>
+        /// DB job 수행 메소드
+        /// </summary>
+        /// <param name="job">job 객체</param>
+        /// <returns>job은 동기로 작업을 합니다.</returns>
+        public void DoJob(IDBJob job)
+        {
+            if (job.QueryJob != null)
+            {
+                NormalQueryJobContext(job);
+            }
+
+            if (job.TransactionQueryJob != null)
+            {
+                TransactionQueryJobContext(job);
+            }
+        }
+
+        private Task TransactionQueryJobAsync(IDBJob job)
         {
             Task result = Task.Factory.StartNew(() =>
             {
-                TransactionConext transaction = null;
-                MySqlConnection connection = null;
-                try
-                {
-                    connection = new MySqlConnection(ConnectionStringBuilder.ToString());
-                    connection.Open();
-                    transaction = new TransactionConext(connection);
-                    job.TransactionQueryJob(transaction);
-                    transaction.Commit();
-                    connection.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    if (job.ExceptionJob != null)
-                        job.ExceptionJob(ex);
-
-                    if (transaction != null)
-                        transaction.Rollback();
-                    
-                    if (connection != null)
-                        connection.Dispose();
-                }
+                TransactionQueryJobContext(job);
             });
 
             return result;
         }
 
-        private Task NormalQueryJob(IDBJob job)
+        private void TransactionQueryJobContext(IDBJob job)
+        {
+            TransactionConext transaction = null;
+            MySqlConnection connection = null;
+            try
+            {
+                connection = new MySqlConnection(ConnectionStringBuilder.ToString());
+                connection.Open();
+                transaction = new TransactionConext(connection);
+                job.TransactionQueryJob(transaction);
+                transaction.Commit();
+                connection.Dispose();
+            }
+            catch (Exception ex)
+            {
+                if (job.ExceptionJob != null)
+                    job.ExceptionJob(ex);
+
+                if (transaction != null)
+                    transaction.Rollback();
+
+                if (connection != null)
+                    connection.Dispose();
+            }
+        }
+
+        private Task NormalQueryJobAsync(IDBJob job)
         {
             Task result = Task.Factory.StartNew(() =>
             {
-                try
-                {
-                    using (MySqlConnection c = new MySqlConnection(ConnectionStringBuilder.ToString()))
-                    {
-                        c.Open();
-                        job.QueryJob(c);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (job.ExceptionJob != null)
-                        job.ExceptionJob(ex);
-                }
+                NormalQueryJobContext(job);
             });
             return result;
+        }
+
+        private void NormalQueryJobContext(IDBJob job)
+        {
+            try
+            {
+                using (MySqlConnection c = new MySqlConnection(ConnectionStringBuilder.ToString()))
+                {
+                    c.Open();
+                    job.QueryJob(c);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (job.ExceptionJob != null)
+                    job.ExceptionJob(ex);
+            }
         }
 
         public void Dispose()
