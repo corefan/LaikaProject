@@ -59,6 +59,9 @@ namespace Laika.Log
 
         private void logging(string format, params object[] args)
         {
+            if (_logQueue.IsAddingCompleted == true)
+                return;
+
             string log = string.Format(format, args);
             _logQueue.TryAdd(log);
         }

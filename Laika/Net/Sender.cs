@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Laika.Net.Message;
 using Laika.Net.Header;
 using Laika.Net.Body;
@@ -18,7 +19,7 @@ namespace Laika.Net
         {
             if (message == null)
                 return;
-            if (message.socket == null)
+            if (message.socket == null && (message.sockets == null || message.sockets.Count <= 0))
                 return;
             if (message.Header == null || message.Header.HeaderRawData == null || message.Header.HeaderRawData.Length <= 0)
                 return;
@@ -29,21 +30,40 @@ namespace Laika.Net
             message.Header.HeaderRawData.CopyTo(sendData, 0);
             message.Body.BodyRawData.CopyTo(sendData, message.Header.HeaderRawData.Length);
 
+            if (message.socket != null)
+            {
+                SendMessageToSocket(message.socket, sendData);
+            }
+
+            if (message.sockets != null && message.sockets.Count <= 0)
+            {
+                message.sockets.ForEach(x => 
+                {
+                    if (x.Connected == true)
+                        SendMessageToSocket(x, sendData);
+                });
+
+                message.sockets.Clear();
+            }
+        }
+
+        private void SendMessageToSocket(Socket socket, byte[] sendData)
+        {
             SendContext context = new SendContext();
             context.SendData = sendData;
 
             SocketAsyncEventArgs e = new SocketAsyncEventArgs();
-            e.SetBuffer(sendData, 0, sendData.Length);
+            e.SetBuffer(context.SendData, 0, context.SendData.Length);
             e.UserToken = context;
             e.Completed += SendCompleted;
 
-            message.socket.SendAsync(e);
+            socket.SendAsync(e);
         }
 
         private void SendCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = (Socket)sender;
-            SendContext context = (SendContext)e.UserToken;
+            Socket socket = sender as Socket;
+            SendContext context = e.UserToken as SendContext;
 
             try
             {
@@ -57,22 +77,24 @@ namespace Laika.Net
                 {
                     if (DisconnectedSocket != null)
                         DisconnectedSocket(socket);
+
+                    CleanArgument(e, context);
+                    return;
                 }
                 else if (context.BytesTransferred < context.SendData.Length)
                 {
-                    SocketAsyncEventArgs ea = new SocketAsyncEventArgs();
-                    ea.UserToken = context;
-                    ea.SetBuffer(context.SendData, context.BytesTransferred, context.SendData.Length - context.BytesTransferred);
-                    ea.Completed += SendCompleted;
+                    e.UserToken = context;
+                    e.SetBuffer(context.SendData, context.BytesTransferred, context.SendData.Length - context.BytesTransferred);
 
-                    socket.SendAsync(ea);
+                    socket.SendAsync(e);
                 }
                 else if (context.BytesTransferred == context.SendData.Length)
                 {
-                    // send completed.
+                    CleanArgument(e, context);
                 }
                 else
                 {
+                    CleanArgument(e, context);
                     throw new SocketException();
                 }
             }
@@ -80,6 +102,21 @@ namespace Laika.Net
             {
                 if (OccuredExceptionFromSocket != null)
                     OccuredExceptionFromSocket(socket, ex);
+            }
+        }
+
+        private void CleanArgument(SocketAsyncEventArgs e, SendContext context)
+        {
+            if (e != null)
+            {
+                e.Dispose();
+                e = null;
+            }
+
+            if (context != null)
+            {
+                context.SendData = null;
+                context = null;
             }
         }
 

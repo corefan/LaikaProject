@@ -58,7 +58,9 @@
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
     <Compile Include="Net\Acceptor.cs" />
     <Compile Include="Net\Body\IBody.cs" />
+    <Compile Include="Net\Connector.cs" />
     <Compile Include="Net\Header\IHeader.cs" />
+    <Compile Include="Net\LaikaTcpClient.cs" />
     <Compile Include="Net\Message\IMessage.cs" />
     <Compile Include="Net\LaikaTcpServer.cs" />
     <Compile Include="Net\Receiver.cs" />

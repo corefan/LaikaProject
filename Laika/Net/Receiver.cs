@@ -15,7 +15,7 @@ namespace Laika.Net
         where bodyT : class, IBody, new()
     {
         internal event ReceiveHandle ReceivedMessage;
-        internal delegate void ReceiveHandle(Socket socket, IMessage message);
+        internal delegate void ReceiveHandle(IMessage message);
 
         internal event ExceptionSocketHandle OccuredExceptionFromSocket;
         internal delegate void ExceptionSocketHandle(Socket socket, Exception ex);
@@ -27,10 +27,12 @@ namespace Laika.Net
         {
             if (socket == null)
                 return;
+            SocketAsyncEventArgs e = null;
             try
             {
-                SocketAsyncEventArgs e = new SocketAsyncEventArgs();
+                e = new SocketAsyncEventArgs();
                 messageT message = new messageT();
+                message.socket = socket;
                 message.Header = new headerT();
                 message.Header.HeaderRawData = new byte[message.Header.GetHeaderSize()];
                 e.UserToken = message;
@@ -41,6 +43,7 @@ namespace Laika.Net
             }
             catch (Exception ex)
             {
+                CleanArgument(e);
                 if (OccuredExceptionFromSocket != null)
                     OccuredExceptionFromSocket(socket, ex);
             }
@@ -48,49 +51,51 @@ namespace Laika.Net
 
         private void ReceiveHeaderCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = (Socket)sender;
-            messageT message = (messageT)e.UserToken;
+            Socket socket = sender as Socket;
+            messageT message = e.UserToken as messageT;
             try
             {
                 if (socket == null)
                     throw new ArgumentNullException();
 
                 int transferred = e.BytesTransferred;
+                message.Header.BytesTransferred += transferred;
+                
                 if (transferred <= 0)
                 {
                     if (DisconnectedSocket != null)
                         DisconnectedSocket(socket);
+                    
+                    CleanArgument(e);
                     return;
                 }
-                else if (message.Header.BytesTransferred + transferred < message.Header.GetHeaderSize())
+                else if (message.Header.BytesTransferred < message.Header.GetHeaderSize())
                 {
-                    message.Header.BytesTransferred += transferred;
-                    SocketAsyncEventArgs ea = new SocketAsyncEventArgs();
-                    ea.UserToken = message;
-                    ea.SetBuffer(message.Header.HeaderRawData, message.Header.BytesTransferred, message.Header.GetHeaderSize() - message.Header.BytesTransferred);
-                    ea.Completed += ReceiveHeaderCompleted;
+                    e.SetBuffer(message.Header.HeaderRawData, message.Header.BytesTransferred, message.Header.GetHeaderSize() - message.Header.BytesTransferred);
 
-                    socket.ReceiveAsync(ea);
+                    socket.ReceiveAsync(e);
                 }
-                else if (message.Header.BytesTransferred + transferred == message.Header.GetHeaderSize())
+                else if (message.Header.BytesTransferred == message.Header.GetHeaderSize())
                 {
                     message.Body = new bodyT();
                     message.Header.ContentsSize = BitConverter.ToInt32(message.Header.HeaderRawData, 0);
                     message.Body.BodyRawData = new byte[message.Header.ContentsSize];
-                    SocketAsyncEventArgs ea = new SocketAsyncEventArgs();
-                    ea.UserToken = message;
-                    ea.SetBuffer(message.Body.BodyRawData, 0, message.Header.ContentsSize);
-                    ea.Completed += ReceiveBodyCompleted;
 
-                    socket.ReceiveAsync(ea);
+                    e.SetBuffer(message.Body.BodyRawData, 0, message.Header.ContentsSize);
+                    e.Completed -= ReceiveHeaderCompleted;
+                    e.Completed += ReceiveBodyCompleted;
+
+                    socket.ReceiveAsync(e);
                 }
                 else
                 {
+                    CleanArgument(e);
                     throw new ArgumentException();
                 }
             }
             catch (Exception ex)
             {
+                CleanArgument(e);
                 if (OccuredExceptionFromSocket != null)
                     OccuredExceptionFromSocket(socket, ex);
             }
@@ -98,44 +103,59 @@ namespace Laika.Net
 
         private void ReceiveBodyCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = (Socket)sender;
-            messageT message = (messageT)e.UserToken;
+            Socket socket = sender as Socket;
+            messageT message = e.UserToken as messageT;
             try
             {
                 if (socket == null)
                     throw new ArgumentNullException();
 
                 int transferred = e.BytesTransferred;
+                message.Body.BytesTransferred += transferred;
+
                 if (transferred <= 0)
                 {
                     if (DisconnectedSocket != null)
                         DisconnectedSocket(socket);
+                    
+                    CleanArgument(e);
                     return;
                 }
-                else if (message.Body.BytesTransferred + transferred < message.Header.ContentsSize)
+                else if (message.Body.BytesTransferred < message.Header.ContentsSize)
                 {
-                    message.Body.BytesTransferred += transferred;
-                    SocketAsyncEventArgs ea = new SocketAsyncEventArgs();
-                    ea.UserToken = message;
-                    ea.SetBuffer(message.Body.BodyRawData, message.Body.BytesTransferred, message.Header.ContentsSize - message.Body.BytesTransferred);
-                    ea.Completed += ReceiveBodyCompleted;
+                    e.SetBuffer(message.Body.BodyRawData, message.Body.BytesTransferred, message.Header.ContentsSize - message.Body.BytesTransferred);
 
-                    socket.ReceiveAsync(ea);
+                    socket.ReceiveAsync(e);
                 }
-                else if (message.Body.BytesTransferred + transferred == message.Header.ContentsSize)
+                else if (message.Body.BytesTransferred == message.Header.ContentsSize)
                 {
+                    CleanArgument(e);
+
                     if (ReceivedMessage != null)
-                        ReceivedMessage(socket, message);
+                        ReceivedMessage(message);
+
+                    BeginReceive(socket);
                 }
                 else
                 {
+                    CleanArgument(e);
                     throw new SocketException();
                 }
             }
             catch (Exception ex)
             {
+                CleanArgument(e);
                 if (OccuredExceptionFromSocket != null)
                     OccuredExceptionFromSocket(socket, ex);
+            }
+        }
+
+        private void CleanArgument(SocketAsyncEventArgs e)
+        {
+            if (e != null)
+            {
+                e.Dispose();
+                e = null;
             }
         }
     }

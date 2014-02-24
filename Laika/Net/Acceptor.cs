@@ -18,7 +18,7 @@ namespace Laika.Net
         internal void NewAccept()
         {
             SocketAsyncEventArgs acceptArgs = new SocketAsyncEventArgs();
-            acceptArgs.Completed += new EventHandler<SocketAsyncEventArgs>(AcceptCompleted);
+            acceptArgs.Completed += AcceptCompleted;
             try
             {
                 _acceptingSocket.AcceptAsync(acceptArgs);
@@ -35,8 +35,18 @@ namespace Laika.Net
             Socket client = e.AcceptSocket;
             NewAccept();
 
+            CleanArgument(e);
             if (ConnectedClient != null)
                 ConnectedClient(client);
+        }
+
+        private void CleanArgument(SocketAsyncEventArgs e)
+        {
+            if (e != null)
+            {
+                e.Dispose();
+                e = null;
+            }
         }
 
         private Socket _acceptingSocket;

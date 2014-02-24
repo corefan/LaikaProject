@@ -63,6 +63,26 @@ namespace Laika.Net
         {
             InitializeServer();
         }
+        /// <summary>
+        /// 서버 준비. Blocking.
+        /// </summary>
+        public void Run()
+        {
+            Poll();
+            _serverWait.WaitOne();
+        }
+        /// <summary>
+        /// Dispose 패턴. 서버 종료 시 호출이 필요합니다.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        public void SendMessage(IMessage message)
+        {
+            _sender.SendAsync(message);
+        }
 
         private void InitializeServer()
         {
@@ -102,10 +122,10 @@ namespace Laika.Net
 
             OccuredExceptionSocket(ex);
         }
-        private void ReceivedMessage(Socket client, IMessage message)
+        private void ReceivedMessage(IMessage message)
         {
             if (ReceivedMessageFromClient != null)
-                ReceivedMessageFromClient(client, message);
+                ReceivedMessageFromClient(message.socket, message);
         }
         private void InitializeSender()
         {
@@ -124,6 +144,7 @@ namespace Laika.Net
 
         private void ConnectedClient(Socket socket)
         {
+            ConnectedSocket(socket);
             _receiver.BeginReceive(socket);
         }
 
@@ -131,22 +152,6 @@ namespace Laika.Net
         {
             if (OccuredError != null)
                 OccuredError(ex);
-        }
-        /// <summary>
-        /// 서버 준비. Blocking.
-        /// </summary>
-        public void Run()
-        {
-            Poll();
-            _serverWait.WaitOne();
-        }
-        /// <summary>
-        /// Dispose 패턴. 서버 종료 시 호출이 필요합니다.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -183,5 +188,8 @@ namespace Laika.Net
 
         public event ErrorHandle OccuredError;
         public delegate void ErrorHandle(Exception ex);
+
+        public event ConnectHandle ConnectedSocket;
+        public delegate void ConnectHandle(Socket socket);
     }
 }
