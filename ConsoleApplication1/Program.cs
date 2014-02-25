@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Laika.Log;
 using Laika.Net;
+using Laika.Crypto;
+using Laika.PushNotification;
+using Laika.Crash;
 
 namespace ConsoleApplication1
 {
@@ -13,12 +16,43 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
+            TripleDesTest();
             //FileLogTest();
-
-            ServerTest();
-            ClientTest();
-
+            //CrashTest();
+            //PushTest();
+            //MD5Test();
+            //ServerTest();
+            //ClientTest();
+            Console.WriteLine("End");
             Console.ReadKey();
+        }
+
+        private static void TripleDesTest()
+        {
+            LaikaTripleDES des = new LaikaTripleDES(Encoding.UTF8.GetBytes("1234567890123456"));
+            byte[] r = des.Encrypt(Encoding.UTF8.GetBytes("1234567890123456"));
+            byte[] r1 = des.Decrypt(r);
+            string s = Encoding.UTF8.GetString(r1);
+        }
+
+        private static void CrashTest()
+        {
+            CrashHandler c = new CrashHandler();
+            c.RegisterCrashLogWriter();
+            throw new Exception("2");
+        }
+
+        private static void PushTest()
+        {
+            
+        }
+
+        private static void MD5Test()
+        {
+            byte[] result = LaikaMD5.GetMd5Hash(null);
+            byte[] result1 = LaikaMD5.GetMd5Hash(Encoding.UTF8.GetBytes("hello"));
+            string r1 = LaikaMD5.GetStringFromMd5hashBytes(result1);
+            string r2 = LaikaMD5.GetStringFromMd5hashBytes(result1, true);
         }
 
         private static void ClientTest()

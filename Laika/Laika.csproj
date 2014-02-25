@@ -48,6 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Crash\CrashHandler.cs" />
+    <Compile Include="Crypto\AES256.cs" />
+    <Compile Include="Crypto\SHA1.cs" />
+    <Compile Include="Crypto\MD5.cs" />
+    <Compile Include="Crypto\SHA256.cs" />
+    <Compile Include="Crypto\SHA512.cs" />
+    <Compile Include="Crypto\TripleDES.cs" />
     <Compile Include="Database\MySql\DatabaseForMySQL.cs" />
     <Compile Include="Database\MySql\IDatabase.cs" />
     <Compile Include="Database\MySql\IDBJob.cs" />
@@ -65,6 +72,11 @@
     <Compile Include="Net\LaikaTcpServer.cs" />
     <Compile Include="Net\Receiver.cs" />
     <Compile Include="Net\Sender.cs" />
+    <Compile Include="PushNotification\Apple\APNSInfo.cs" />
+    <Compile Include="PushNotification\Apple\ApplePushNotification.cs" />
+    <Compile Include="PushNotification\Google\GooglePushNotification.cs" />
+    <Compile Include="PushNotification\IPushNotification.cs" />
+    <Compile Include="Random\ServerRandom.cs" />
     <Compile Include="ThreadPool\AppDomainThreadPoolManager.cs" />
     <Compile Include="Log\FileLog.cs" />
     <Compile Include="Log\FileLogFactory.cs" />
