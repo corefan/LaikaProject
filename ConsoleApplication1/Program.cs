@@ -10,6 +10,9 @@ using Laika.Crypto;
 using Laika.PushNotification;
 using Laika.Crash;
 using Laika.MessageHandler;
+using Laika.Database;
+using Laika.Database.MySqlDB;
+using MySql.Data.MySqlClient;
 
 namespace ConsoleApplication1
 {
@@ -37,7 +40,8 @@ namespace ConsoleApplication1
     {
         static void Main(string[] args)
         {
-            TestMessageHandler();
+            DBTest();
+            //TestMessageHandler();
             //TripleDesTest();
             //FileLogTest();
             //CrashTest();
@@ -47,6 +51,31 @@ namespace ConsoleApplication1
             //ClientTest();
             Console.WriteLine("End");
             Console.ReadKey();
+        }
+
+        private static void DBTest()
+        {
+            IDatabase db = new DatabaseForMySql("localhost", 3306, "root", "alsdl12#$", "test", 10, 100);
+
+            MySqlJob job = MySqlJob.CreateMySQLJob(x => 
+            {
+                using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user(uid, score, last_play) VALUES(1, 1, NOW());", x))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            });
+            db.DoJobAsync(job).Wait();
+            
+
+            MySqlJob tj = MySqlJob.CreateMySQLTransactionJob(x => 
+            {
+                //using (MySqlCommand cmd = 
+                //{
+                //    cmd.ExecuteNonQuery();
+                //}
+            });
+            db.DoJobAsync(tj).Wait();
+
         }
 
         private static void TestMessageHandler()

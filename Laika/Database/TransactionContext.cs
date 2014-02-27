@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MySql.Data.MySqlClient;
+using System.Data.Common;
 
-namespace Laika.Database.MySqlDB
+namespace Laika.Database
 {
     /// <summary>
     /// Transaction 관리 클래스
     /// </summary>
-    public class TransactionConext
+    public abstract class TransactionContext
     {
         /// <summary>
         /// Transaction 관리 인스턴스 생성
         /// </summary>
         /// <param name="c"></param>
-        public TransactionConext(MySqlConnection c)
+        public TransactionContext(DbConnection c)
         {
             connection = c;
 
@@ -27,14 +24,16 @@ namespace Laika.Database.MySqlDB
         /// </summary>
         /// <param name="query">수행될 쿼리</param>
         /// <returns>MySqlCommand 인스턴스</returns>
-        public MySqlCommand CreateMySqlCommand(string query)
-        {
-            var command = connection.CreateCommand();
-            command.Connection = connection;
-            command.Transaction = Transaction;
-            command.CommandText = query;
-            return command;
-        }
+        //public DbCommand CreateDbCommand(string query)
+        //{
+        //    var command = connection.CreateCommand();
+        //    command.Connection = connection;
+        //    command.Transaction = Transaction;
+        //    command.CommandText = query;
+        //    return command;
+        //}
+
+        protected abstract DbCommand CreateDbCommand(string query);
 
         internal void Commit()
         {
@@ -49,8 +48,8 @@ namespace Laika.Database.MySqlDB
             Transaction.Rollback();
         }
 
-        internal MySqlTransaction Transaction { get; private set; }
-        private MySqlConnection connection;
+        internal DbTransaction Transaction { get; private set; }
+        protected DbConnection connection;
         public bool IsTransactionRollbackNeed = false;
     }
 }

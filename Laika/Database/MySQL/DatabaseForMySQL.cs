@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
@@ -112,14 +109,14 @@ namespace Laika.Database.MySqlDB
 
         private void TransactionQueryJobContext(IDBJob job)
         {
-            TransactionConext transaction = null;
+            MySqlTransactionContext transaction = null;
             MySqlConnection connection = null;
             try
             {
                 connection = new MySqlConnection(ConnectionStringBuilder.ToString());
                 connection.Open();
-                transaction = new TransactionConext(connection);
-                job.TransactionQueryJob(transaction);
+                transaction = new MySqlTransactionContext(connection);
+                job.MySqlTransactionQueryJob(transaction);
                 transaction.Commit();
                 connection.Dispose();
             }
@@ -152,7 +149,7 @@ namespace Laika.Database.MySqlDB
                 using (MySqlConnection c = new MySqlConnection(ConnectionStringBuilder.ToString()))
                 {
                     c.Open();
-                    job.QueryJob(c);
+                    job.MySqlQueryJob(c);
                 }
             }
             catch (Exception ex)

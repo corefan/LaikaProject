@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Laika.Database.MySqlDB
+namespace Laika.Database
 {
     /// <summary>
     /// 데이터베이스 인터페이스
