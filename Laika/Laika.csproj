@@ -63,6 +63,12 @@
     <Compile Include="ExtendBundle\ExtendArray.cs" />
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
+    <Compile Include="MessageHandler\MessageHandlerAttribute.cs" />
+    <Compile Include="MessageHandler\MessageInvokeHandlerFive.cs" />
+    <Compile Include="MessageHandler\MessageInvokeHandlerFour.cs" />
+    <Compile Include="MessageHandler\MessageInvokeHandlerOne.cs" />
+    <Compile Include="MessageHandler\MessageInvokeHandlerThree.cs" />
+    <Compile Include="MessageHandler\MessageInvokeHandlerTwo.cs" />
     <Compile Include="Net\Acceptor.cs" />
     <Compile Include="Net\Body\IBody.cs" />
     <Compile Include="Net\Connector.cs" />
@@ -91,9 +97,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LRedis\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

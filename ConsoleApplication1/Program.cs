@@ -9,14 +9,36 @@ using Laika.Net;
 using Laika.Crypto;
 using Laika.PushNotification;
 using Laika.Crash;
+using Laika.MessageHandler;
 
 namespace ConsoleApplication1
 {
+    public enum MessageType
+    {
+        Login = 0,
+        Join,
+    }
+
+    class Logic
+    {
+        [MessageHandler((int)MessageType.Login)]
+        public string Login(int arg)
+        {
+            return arg.ToString();
+        }
+
+        [MessageHandler((int)MessageType.Join)]
+        public string Join(int arg)
+        {
+            return arg.ToString();
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            TripleDesTest();
+            TestMessageHandler();
+            //TripleDesTest();
             //FileLogTest();
             //CrashTest();
             //PushTest();
@@ -25,6 +47,17 @@ namespace ConsoleApplication1
             //ClientTest();
             Console.WriteLine("End");
             Console.ReadKey();
+        }
+
+        private static void TestMessageHandler()
+        {
+            MessageInvokeHandler<int, string> handler = new MessageInvokeHandler<int, string>();
+
+            handler.RegisterHandler<Logic>();
+            handler.InvokeMethod(0, 0);
+            Task<string> t = handler.InvokeMethodAsync(1, 1);
+
+            t.ContinueWith(_t => { Console.WriteLine(_t.Result); });
         }
 
         private static void TripleDesTest()
