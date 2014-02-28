@@ -11,7 +11,8 @@ using Laika.PushNotification;
 using Laika.Crash;
 using Laika.MessageHandler;
 using Laika.Database;
-using Laika.Database.MySqlDB;
+using Laika.Database.Sharding;
+using Laika.Database.MySql;
 using MySql.Data.MySqlClient;
 
 namespace ConsoleApplication1
@@ -36,10 +37,30 @@ namespace ConsoleApplication1
             return arg.ToString();
         }
     }
+
+    class sharding : Laika.Database.Sharding.DatabaseShardingBase<int, string>
+    {
+        /// <summary>
+        /// 현재 DB key가 shardkey와 같을 경우 아래와 같이 재정의 합니다.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override IDatabase FindDB(int key)
+        {
+            string shardKey = key.ToString();
+            if (AllDataBase.ContainsKey(shardKey) == false)
+                return null;
+
+            return AllDataBase[shardKey];
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
+            Laika.ThreadPoolManager.AppDomainThreadPoolManager.SetMinThreadPool(100, 100);
+
             DBTest();
             //TestMessageHandler();
             //TripleDesTest();
@@ -55,27 +76,39 @@ namespace ConsoleApplication1
 
         private static void DBTest()
         {
-            IDatabase db = new DatabaseForMySql("localhost", 3306, "root", "alsdl12#$", "test", 10, 100);
-
-            MySqlJob job = MySqlJob.CreateMySQLJob(x => 
+            MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
+            sb.UserID = "root";
+            sb.Password = "alsdl12#$";
+            sb.Database = "test";
+            sb.Server = "localhost";
+            sb.Pooling = true;
+            sb.MinimumPoolSize = 10;
+            sb.MaximumPoolSize = 20;
+            IDatabase db = CreateDbFactory.CreateMySqlDatabase(sb);
+            MySqlDbJob job = MySqlDbJob.CreateMySqlTransactionJob(x => 
             {
-                using (MySqlCommand cmd = new MySqlCommand("INSERT INTO user(uid, score, last_play) VALUES(1, 1, NOW());", x))
+                using (MySqlCommand cmd = x.CreateDbCommand("INSERT INTO user SET uid=1, score = 100, last_play=NOW();"))
                 {
                     cmd.ExecuteNonQuery();
                 }
-            });
-            db.DoJobAsync(job).Wait();
-            
 
-            MySqlJob tj = MySqlJob.CreateMySQLTransactionJob(x => 
-            {
-                //using (MySqlCommand cmd = 
-                //{
-                //    cmd.ExecuteNonQuery();
-                //}
-            });
-            db.DoJobAsync(tj).Wait();
+                int score = 0;
+                using (MySqlCommand cmd = x.CreateDbCommand("SELECT score FROM user WHERE uid=1;"))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        score = reader.GetInt32(0);
+                    }
+                }
 
+                using (MySqlCommand cmd = x.CreateDbCommand("UPDATE user SET score = score + 1 WHERE uid=1;"))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }, ex => { Console.WriteLine(ex.ToString()); });
+
+            db.AsyncDoJob(job).Wait();
         }
 
         private static void TestMessageHandler()

@@ -1,24 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Laika.Database
 {
     /// <summary>
-    /// 데이터베이스 인터페이스
+    /// Database 인터페이스
     /// </summary>
-    public interface IDatabase : IDisposable
+    public interface IDatabase
     {
         /// <summary>
-        /// DB job 수행 비동기 메소드
+        /// 비동기 작업 수행
         /// </summary>
-        /// <param name="job">job 객체</param>
-        /// <returns>job은 비동기로 작업을 하며, Task를 return 합니다.</returns>
-        Task DoJobAsync(IDBJob job);
+        /// <param name="job">DB 작업</param>
+        /// <returns>비동기 Task</returns>
+        Task AsyncDoJob(DbJobBase job);
         /// <summary>
-        /// DB job 수행 메소드
+        /// 동기 작업 수행
         /// </summary>
-        /// <param name="job">job 객체</param>
-        /// <returns>job은 동기로 작업 합니다.</returns>
-        void DoJob(IDBJob job);
+        /// <param name="job">DB 작업</param>
+        void DoJob(DbJobBase job);
     }
 }

@@ -6,32 +6,57 @@ using System.Threading.Tasks;
 using System.Data.Common;
 using MySql.Data.MySqlClient;
 
-namespace Laika.Database.MySqlDB
+namespace Laika.Database.MySql
 {
-    public class MySqlTransactionContext : TransactionContext
+    /// <summary>
+    /// Transaction 처리 Context
+    /// </summary>
+    public class MySqlTransactionContext : TransactionContextBase, IDisposable
     {
+        private bool disposed = false;
+        internal MySqlTransactionContext(MySqlConnection connection)
+            : base(connection)
+        { 
+        
+        }
+
+        ~MySqlTransactionContext()
+        {
+            Dispose(false);
+        }
         /// <summary>
-        /// Transaction 관리 인스턴스 생성
+        /// Dispose 패턴
         /// </summary>
-        /// <param name="c"></param>
-        public MySqlTransactionContext(DbConnection c)
-            :base(c)
+        public void Dispose()
         {
-
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        /// <summary>
+        /// DB Command 생성
+        /// </summary>
+        /// <param name="query">쿼리문</param>
+        /// <returns>DB Command</returns>
+        public MySqlCommand CreateDbCommand(string query)
+        {
+            return (MySqlCommand)CreateCommand(query);
         }
 
-        public MySqlCommand GetTransactionCommand(string query)
+        protected virtual void Dispose(bool disposing)
         {
-            return (MySqlCommand)CreateDbCommand(query);
+            if (disposed == true)
+                return;
+
+            if (disposing == true)
+                Clear();
+
+            disposed = true;
         }
 
-        protected override DbCommand CreateDbCommand(string query)
+        private void Clear()
         {
-            var command = connection.CreateCommand();
-            command.Connection = connection;
-            command.Transaction = Transaction;
-            command.CommandText = query;
-            return command;
+            ((MySqlTransaction)Transaction).Dispose();
+            ((MySqlConnection)Connection).Dispose();
         }
     }
 }
