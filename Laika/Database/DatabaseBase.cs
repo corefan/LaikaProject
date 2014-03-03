@@ -40,6 +40,8 @@ namespace Laika.Database
             });
         }
 
+        public abstract void Dispose();
+
         protected abstract DbConnection GetConnection();
         protected string _connectionString;
     }

@@ -41,7 +41,7 @@ namespace Laika.Database.SqlServer
         /// <summary>
         /// Dispose 패턴
         /// </summary>
-        public void Dispose()
+        public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

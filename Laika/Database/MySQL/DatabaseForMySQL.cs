@@ -11,7 +11,7 @@ namespace Laika.Database.MySql
     /// <summary>
     /// MySql 데이터베이스 클래스
     /// </summary>
-    public class DatabaseForMySql : DatabaseBase, IDisposable
+    public class DatabaseForMySql : DatabaseBase
     {
         private bool disposed = false;
 
@@ -34,7 +34,7 @@ namespace Laika.Database.MySql
         /// <summary>
         /// Dispose 패턴
         /// </summary>
-        public void Dispose()
+        public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

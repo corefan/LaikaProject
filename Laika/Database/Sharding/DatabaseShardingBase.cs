@@ -58,7 +58,38 @@ namespace Laika.Database.Sharding
             return AllDataBase.Values.ToList().AsReadOnly();
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed == true)
+                return;
+
+            if (disposing == true)
+            {
+                Clear();
+            }
+            _disposed = true;
+        }
+
+        private void Clear()
+        {
+            List<IDatabase> dbList = AllDataBase.Values.ToList();
+            dbList.ForEach(x => x.Dispose());
+            AllDataBase.Clear();
+        }
+
+        ~DatabaseShardingBase()
+        {
+            Dispose(false);
+        }
+
         protected ShardKeyType _shardKey = default(ShardKeyType);
         protected Dictionary<DBKeyType, IDatabase> AllDataBase = new Dictionary<DBKeyType, IDatabase>();
+        private bool _disposed = false;
     }
 }

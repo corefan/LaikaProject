@@ -11,7 +11,7 @@ namespace Laika.Database
     /// </summary>
     /// <typeparam name="KeyType">샤딩 키 타입</typeparam>
     /// <typeparam name="DBKeyType">DB 키 타입</typeparam>
-    public interface IDatabaseSharding<KeyType, DBKeyType>
+    public interface IDatabaseSharding<KeyType, DBKeyType> : IDisposable
     {
         /// <summary>
         /// 샤딩 키로 데이터베이스를 찾는 메소드

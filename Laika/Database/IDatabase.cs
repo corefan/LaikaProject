@@ -9,7 +9,7 @@ namespace Laika.Database
     /// <summary>
     /// Database 인터페이스
     /// </summary>
-    public interface IDatabase
+    public interface IDatabase : IDisposable
     {
         /// <summary>
         /// 비동기 작업 수행
