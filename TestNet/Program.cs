@@ -30,14 +30,6 @@ namespace TestNet
     class Message : IMessage
     {
         public IHeader Header { get; set; }
-        //{
-        //    get
-        //    {
-        //        return _messageHeader;
-        //    }
-        //}
-
-        //private Header _messageHeader;
         public IBody Body { get; set; }
         public Socket socket { get; set; }
         public List<Socket> sockets { get; set; }
