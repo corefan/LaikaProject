@@ -79,6 +79,9 @@ namespace Laika.Net
                 {
                     message.Body = new bodyT();
                     message.Header.ContentsSize = BitConverter.ToInt32(message.Header.HeaderRawData, 0);
+                    if (message.Header.ContentsSize <= 0 || message.Header.ContentsSize > LaikaConfig.MaxBodySize)
+                        throw new ArgumentException(string.Format("Invalid Body Size, Size : {0}", message.Header.ContentsSize));
+
                     message.Body.BodyRawData = new byte[message.Header.ContentsSize];
 
                     e.SetBuffer(message.Body.BodyRawData, 0, message.Header.ContentsSize);

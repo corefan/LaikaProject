@@ -23,7 +23,7 @@ namespace Laika.Net
                 return;
             if (message.Header == null || message.Header.HeaderRawData == null || message.Header.HeaderRawData.Length <= 0)
                 return;
-            if (message.Body == null || message.Body.BodyRawData == null || message.Body.BodyRawData.Length <= 0)
+            if (message.Body == null || message.Body.BodyRawData == null || message.Body.BodyRawData.Length <= 0 || message.Body.BodyRawData.Length > LaikaConfig.MaxBodySize)
                 return;
 
             byte[] sendData = new byte[message.Header.HeaderRawData.Length + message.Body.BodyRawData.Length];

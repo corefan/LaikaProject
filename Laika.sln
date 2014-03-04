@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestNet", "TestNet\TestNet.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPushNotice", "TestPushNotice\TestPushNotice.csproj", "{5D476CC8-889A-4C07-B73B-83DC60B383C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestData", "TestData\TestData.csproj", "{0C1DE280-6D81-44BA-A82D-52556D0D9D61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestEventScheduler", "TestEventScheduler\TestEventScheduler.csproj", "{9D0B4DD0-0AB9-4CBA-B003-C51A7BA90F15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,14 @@ Global
 		{5D476CC8-889A-4C07-B73B-83DC60B383C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D476CC8-889A-4C07-B73B-83DC60B383C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D476CC8-889A-4C07-B73B-83DC60B383C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C1DE280-6D81-44BA-A82D-52556D0D9D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1DE280-6D81-44BA-A82D-52556D0D9D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1DE280-6D81-44BA-A82D-52556D0D9D61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1DE280-6D81-44BA-A82D-52556D0D9D61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D0B4DD0-0AB9-4CBA-B003-C51A7BA90F15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D0B4DD0-0AB9-4CBA-B003-C51A7BA90F15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D0B4DD0-0AB9-4CBA-B003-C51A7BA90F15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D0B4DD0-0AB9-4CBA-B003-C51A7BA90F15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

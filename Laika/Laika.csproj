@@ -68,6 +68,13 @@
     <Compile Include="Database\SqlServer\SqlServerDbJob.cs" />
     <Compile Include="Database\SqlServer\SqlServerTransactionContext.cs" />
     <Compile Include="Database\TransactionContextBase.cs" />
+    <Compile Include="Data\Ini\Ini.cs" />
+    <Compile Include="Data\Json\JsonToObject.cs" />
+    <Compile Include="Data\Json\MiniJson.cs" />
+    <Compile Include="Data\Xml\XmlUtility.cs" />
+    <Compile Include="Event\Event.cs" />
+    <Compile Include="Event\EventScheduler.cs" />
+    <Compile Include="Event\TaskService.cs" />
     <Compile Include="ExtendBundle\ExtendArray.cs" />
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
@@ -86,6 +93,7 @@
     <Compile Include="Net\LaikaTcpServer.cs" />
     <Compile Include="Net\Receiver.cs" />
     <Compile Include="Net\Sender.cs" />
+    <Compile Include="Net\ServerConfig.cs" />
     <Compile Include="PushNotification\Apple\APNSInfo.cs" />
     <Compile Include="PushNotification\Apple\ApplePushNotification.cs" />
     <Compile Include="PushNotification\Google\GooglePushNotification.cs" />
