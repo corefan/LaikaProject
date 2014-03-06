@@ -132,8 +132,44 @@ namespace TestDatabase
             TestAsyncTransactionJob(db);
             TestSyncTransactionJob(db);
             TestRollbackTransactionJob(db);
+            TestMultiTransaction(db);
 
             return db;
+        }
+
+        private static void TestMultiTransaction(IDatabase db)
+        {
+            MySqlDbJob job = MySqlDbJob.CreateMySqlTransactionJob(transactionContext => 
+            {
+                transactionContext.ManualCommit = true;
+                using (MySqlCommand cmd = transactionContext.CreateDbCommand("INSERT INTO test(col) VALUES(10);"))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            });
+
+            MySqlDbJob job1 = MySqlDbJob.CreateMySqlTransactionJob(transactionContext =>
+            {
+                transactionContext.ManualCommit = true;
+                using (MySqlCommand cmd = transactionContext.CreateDbCommand("INSERT INTO test(col) VALUES(21);"))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            });
+
+            db.DoJob(job);
+            db.DoJob(job1);
+
+            if (job.ReadyToCommit == true && job1.ReadyToCommit == true)
+            {
+                job.Commit();
+                job1.Commit();
+            }
+            else
+            {
+                job.Rollback();
+                job1.Rollback();
+            }
         }
 
         private static void TestRollbackTransactionJob(IDatabase db)

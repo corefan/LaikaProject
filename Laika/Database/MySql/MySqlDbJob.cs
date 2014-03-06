@@ -44,5 +44,12 @@ namespace Laika.Database.MySql
             _mySqlTransactionJob = job;
             _exception = ex;
         }
+
+        protected override void TransactionContextDispose()
+        {
+            MySqlTransactionContext mysqlContext = _transaction as MySqlTransactionContext;
+            if (mysqlContext != null)
+                mysqlContext.Dispose();
+        }
     }
 }

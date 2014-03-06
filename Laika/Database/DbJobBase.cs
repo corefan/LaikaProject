@@ -13,6 +13,14 @@ namespace Laika.Database
 {
     public abstract class DbJobBase
     {
+        /// <summary>
+        /// 수동 commit일 경우 commit 준비가 되면 필드는 true가 됩니다. 
+        /// transaction 실패 시 false가 됩니다.
+        /// </summary>
+        public bool ReadyToCommit { get; private set; }
+        
+        protected abstract void TransactionContextDispose();
+
         protected Action<MySqlConnection> _mySqlJob = null;
         protected Action<MySqlTransactionContext> _mySqlTransactionJob = null;
 
@@ -21,26 +29,73 @@ namespace Laika.Database
 
         protected Action<Exception> _exception = null;
 
+        protected TransactionContextBase _transaction = null;
+        private bool _failed = false;
+        /// <summary>
+        /// 수동 commit을 할 경우 transaction 성공 시 commit됩니다.
+        /// </summary>
+        public void Commit()
+        {
+            if (_transaction == null)
+                return;
+
+            if (_transaction.ManualCommit == true && _transaction.NeedRollback == false)
+                _transaction.Commit();
+            else
+                _transaction.Rollback();
+
+            TransactionContextDispose();
+        }
+        /// <summary>
+        /// 수동 commit을 할 경우 transaction rollback을 합니다.
+        /// </summary>
+        public void Rollback()
+        {
+            if (_transaction == null)
+                return;
+
+            _transaction.Rollback();
+
+            TransactionContextDispose();
+        }
+
         internal void DoJob(DbConnection connection)
         {
-            if (connection == null || connection.State != System.Data.ConnectionState.Open)
-                throw new ArgumentException("Invalid db connection.");
-                        
-            if (_mySqlJob != null)
+            try
             {
-                MySqlJobAction(connection);
+                if (connection == null || connection.State != System.Data.ConnectionState.Open)
+                    throw new ArgumentException("Invalid db connection.");
+
+                if (_mySqlJob != null)
+                {
+                    MySqlJobAction(connection);
+                }
+                else if (_mySqlTransactionJob != null)
+                {
+                    MySqlTransactionAction(connection);
+                }
+                else if (_sqlServerJob != null)
+                {
+                    SqlServerJobAction(connection);
+                }
+                else if (_sqlServerTransactionJob != null)
+                {
+                    SqlTransactionAction(connection);
+                }
+                else
+                {
+                    Exception e = new Exception("Invalid Job.");
+                    _exception(e);
+                    if (_transaction != null)
+                    {
+                        _transaction.Rollback();
+                        TransactionContextDispose();
+                    }
+                }
             }
-            else if (_mySqlTransactionJob != null)
+            catch (Exception e)
             {
-                MySqlTransactionAction(connection);
-            }
-            else if (_sqlServerJob != null)
-            {
-                SqlServerJobAction(connection);
-            }
-            else if (_sqlServerTransactionJob != null)
-            {
-                SqlTransactionAction(connection);
+                _exception(e);
             }
         }
 
@@ -52,16 +107,26 @@ namespace Laika.Database
             {
                 conn = (SqlConnection)connection;
                 transaction = new SqlServerTransactionContext(conn);
+                _transaction = transaction;
 
                 _sqlServerTransactionJob(transaction);
+                if (transaction.ManualCommit == false)
+                {
+                    if (transaction.NeedRollback == true)
+                        transaction.Rollback();
+                    else
+                        transaction.Commit();
 
-                if (transaction.NeedRollback == true)
-                    transaction.Rollback();
+                    _transaction = null;
+                }
                 else
-                    transaction.Commit();
+                {
+                    ReadyToCommit = true;
+                }
             }
             catch (Exception e)
             {
+                _failed = true;
                 if (transaction != null)
                     transaction.Rollback();
 
@@ -70,8 +135,14 @@ namespace Laika.Database
             }
             finally
             {
-                if (transaction != null)
-                    transaction.Dispose();
+                if (transaction.ManualCommit == false || _failed == true)
+                {
+                    if (transaction != null)
+                    {
+                        transaction.Dispose();
+                        _transaction = null;
+                    }
+                }
             }
         }
 
@@ -102,16 +173,26 @@ namespace Laika.Database
             {
                 conn = (MySqlConnection)connection;
                 transaction = new MySqlTransactionContext(conn);
-
+                _transaction = transaction;
                 _mySqlTransactionJob(transaction);
 
-                if (transaction.NeedRollback == true)
-                    transaction.Rollback();
+                if (transaction.ManualCommit == false)
+                {
+                    if (transaction.NeedRollback == true)
+                        transaction.Rollback();
+                    else
+                        transaction.Commit();
+
+                    _transaction = null;
+                }
                 else
-                    transaction.Commit();
+                {
+                    ReadyToCommit = true;
+                }
             }
             catch (Exception e)
             {
+                _failed = true;
                 if (transaction != null)
                     transaction.Rollback();
 
@@ -120,8 +201,14 @@ namespace Laika.Database
             }
             finally
             {
-                if (transaction != null)
-                    transaction.Dispose();
+                if (transaction.ManualCommit == false || _failed == true)
+                {
+                    if (transaction != null)
+                    {
+                        transaction.Dispose();
+                        _transaction = null;
+                    }
+                }
             }
         }
 

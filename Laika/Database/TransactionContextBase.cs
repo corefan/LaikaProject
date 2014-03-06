@@ -50,5 +50,9 @@ namespace Laika.Database
         /// 롤백이 필요할 경우 job 메소드가 끝나기 전에 true로 설정
         /// </summary>
         public bool NeedRollback { get; set; }
+        /// <summary>
+        /// 수동으로 Commit이 필요할 경우 람다 메소드가 끝나기 전에 true로 설정 합니다.
+        /// </summary>
+        public bool ManualCommit { get; set; }
     }
 }

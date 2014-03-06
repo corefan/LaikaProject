@@ -44,5 +44,12 @@ namespace Laika.Database.SqlServer
             _sqlServerTransactionJob = job;
             _exception = ex;
         }
+
+        protected override void TransactionContextDispose()
+        {
+            SqlServerTransactionContext sqlServerContext = _transaction as SqlServerTransactionContext;
+            if (sqlServerContext != null)
+                sqlServerContext.Dispose();
+        }
     }
 }
