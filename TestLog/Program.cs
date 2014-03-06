@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Laika.Log;
 
@@ -17,6 +18,7 @@ namespace TestLog
             //param.Path = "D:\\";
             param.PrintConsole = true;
             param.Type = PartitionType.NONE;
+            param.UsingTrace = true;
             //param.Type = PartitionType.FILE_SIZE; // 파일 사이즈가 일정 값이 넘어가면 두번째 파일을 생성함.
             //param.Size = 1000000; // 1,000,000 bytes, 파일 사이즈가 1,000,000 바이트를 넘어가면.
             //param.Type = PartitionType.TIME; // 파일을 생성 후 일정 시간이 넘어가면 두번째 파일을 생성함.
@@ -29,6 +31,9 @@ namespace TestLog
             log.FATAL_LOG("FATAL");
             log.INFO_LOG("INFO!!");
             log.WARNING_LOG("WARN!!");
+
+            ManualResetEvent mre = new ManualResetEvent(false);
+            mre.WaitOne();
 
             log.Dispose();
         }

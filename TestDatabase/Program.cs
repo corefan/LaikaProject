@@ -27,8 +27,9 @@ namespace TestDatabase
         static void Main(string[] args)
         {
             IDatabase db = TestMySqlDatabase();
-            TestSqlServerDataBase();
             TestSharding(db);
+
+            TestSqlServerDataBase();
         }
 
         private static void TestSharding(IDatabase db)

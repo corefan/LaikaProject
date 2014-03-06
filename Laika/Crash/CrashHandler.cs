@@ -17,11 +17,16 @@ namespace Laika.Crash
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="fileName">log file name prefix</param>
+        public CrashHandler(string fileName)
+            : this (null, "CrashLog")
+        { }
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CrashHandler()
             : this (null, "CrashLog")
-        { 
-        
-        }
+        { }
         /// <summary>
         /// Constructor
         /// </summary>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Diagnostics;
 using Laika.ExtendBundle;
 
 namespace Laika.Log
@@ -112,6 +113,10 @@ namespace Laika.Log
                 if (Param.PrintConsole == true)
                 {
                     Console.WriteLine(item);
+                }
+                if (Param.UsingTrace == true)
+                {
+                    Trace.WriteLine(item);
                 }
             }
         }

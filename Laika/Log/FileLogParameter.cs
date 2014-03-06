@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 namespace Laika.Log
 {
     public class FileLogParameter
     {
-        public FileLogParameter(string path = null, PartitionType type = PartitionType.NONE, string fileName = "log", int time = 60, int size = 1024000, bool debug = false, bool console = false)
+        public FileLogParameter(string path = null, PartitionType type = PartitionType.NONE, string fileName = "log", int time = 60, int size = 1024000, bool debug = false, bool console = false, bool trace = false)
         {
             if (path == null)
                 path = Directory.GetCurrentDirectory();
@@ -20,6 +21,7 @@ namespace Laika.Log
             Time = time;
             Size = size;
             PrintConsole = console;
+            UsingTrace = trace;
         }
 
         /// <summary>
@@ -50,5 +52,9 @@ namespace Laika.Log
         /// 콘솔 출력 여부
         /// </summary>
         public bool PrintConsole { get; set; }
+        /// <summary>
+        /// Trace 사용 여부
+        /// </summary>
+        public bool UsingTrace { get; set; }
     }
 }

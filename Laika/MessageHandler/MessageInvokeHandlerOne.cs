@@ -17,7 +17,12 @@ namespace Laika.MessageHandler
         /// <summary>
         /// 메소드를 뽑아내어 Dictionary에 적재함.
         /// </summary>
-        /// <typeparam name="LC">로직 메소드가 정의된 클래스. class이여야 하며, newable이어야 합니다.</typeparam>
+        /// <typeparam name="LC">
+        /// 로직 메소드가 정의된 클래스. class이여야 하며, newable이어야 합니다.
+        /// 로직 클래스와 메소드는 public이어야 합니다.
+        /// instace 메소드, static 메소드 모두 지원합니다.
+        /// 메소드를 구현할 때에는 Thread Safety 하게 작성하여야 합니다.
+        /// </typeparam>
         public void RegisterHandler<LC>()
             where LC : class, new()
         {

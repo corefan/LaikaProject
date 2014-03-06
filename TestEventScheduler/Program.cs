@@ -12,6 +12,11 @@ namespace TestEventScheduler
     {
         static void Main(string[] args)
         {
+            TestEvent();
+        }
+
+        private static void TestEvent()
+        {
             EventScheduler es = new EventScheduler();
             es.AddEvent("hello",
                 new Event().
@@ -21,9 +26,12 @@ namespace TestEventScheduler
                 Every(new TimeSpan(0, 0, 1)),
                 () => { Console.WriteLine("hello"); }
                 );
-            
+
             ManualResetEvent mre = new ManualResetEvent(false);
             mre.WaitOne();
+
+            es.RemoveEvent("hello");
+            es.Dispose();
         }
     }
 }

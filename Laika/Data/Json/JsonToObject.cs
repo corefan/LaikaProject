@@ -55,6 +55,15 @@ namespace Laika.Data.Json
 
             return data[key];
         }
+        /// <summary>
+        /// IDictionary / IList 객체나 간단한 타입(string, int 등) json string으로 변환
+        /// </summary>
+        /// <param name="data">IDictionary나 IList</param>
+        /// <returns>json string</returns>
+        public string Serialize(object data)
+        {
+            return MiniJSON.Json.Serialize(data);
+        }
 
         private string _file;
         private string _contents;

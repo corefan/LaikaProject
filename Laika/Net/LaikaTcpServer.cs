@@ -86,11 +86,11 @@ namespace Laika.Net
 
         private void InitializeServer()
         {
-            _serverSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _serverSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _serverSocket.LingerState.Enabled = false;
-            _serverSocket.Bind(_endPoint);
-            _serverSocket.Listen(1000);
+            _listenerSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _listenerSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _listenerSocket.LingerState.Enabled = false;
+            _listenerSocket.Bind(_endPoint);
+            _listenerSocket.Listen(1000);
             InitializeSender();
             InitializeReceiver();
             InitializeAcceptor();
@@ -136,7 +136,7 @@ namespace Laika.Net
 
         private void InitializeAcceptor()
         {
-            _acceptor = new Acceptor(_serverSocket);
+            _acceptor = new Acceptor(_listenerSocket);
             _acceptor.ConnectedClient += ConnectedClient;
             _acceptor.OccuredExceptionFromSocket += OccuredExceptionSocket;
             _acceptor.NewAccept();
@@ -167,16 +167,16 @@ namespace Laika.Net
 
         private void Clear()
         {
-            if (_serverSocket != null)
+            if (_listenerSocket != null)
             {
-                _serverSocket.Shutdown(SocketShutdown.Both);
-                _serverSocket.Dispose();
-                _serverSocket = null;
+                _listenerSocket.Shutdown(SocketShutdown.Both);
+                _listenerSocket.Dispose();
+                _listenerSocket = null;
             }
         }
 
         private IPEndPoint _endPoint;
-        private Socket _serverSocket;
+        private Socket _listenerSocket;
         private ManualResetEvent _serverWait = new ManualResetEvent(false);
         private bool _disposed = false;
         private Acceptor _acceptor;

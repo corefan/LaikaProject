@@ -73,6 +73,7 @@ namespace TestData
             object o = j.GetRoot();
             object c = j.GetValue(o, "test");
             object l = j.GetValue(c, "key2");
+            string ser = j.Serialize(o);
         }
     }
 }
