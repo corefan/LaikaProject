@@ -20,7 +20,7 @@ namespace TestCrashLog
             throw new Exception("fds");
             
             // 핸들러 등록 해지
-            handler.UnRegisterCrashLogWriter();
+            // handler.UnRegisterCrashLogWriter();
         }
 
         private static void SetMiniDump()

@@ -32,12 +32,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Jint">
+      <HintPath>..\packages\Jint.2.1.0.0\lib\portable-net40+sl50+wp80+win\Jint.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.8.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.8.3\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compression\GZip\GZip.cs" />
     <Compile Include="Crash\CrashHandler.cs" />
     <Compile Include="Crash\MiniDump.cs" />
     <Compile Include="Crypto\AES256.cs" />
@@ -76,6 +84,7 @@
     <Compile Include="ExtendBundle\ExtendArray.cs" />
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
+    <Compile Include="SimpleImage\SimpleBitmap.cs" />
     <Compile Include="MessageHandler\MessageHandlerAttribute.cs" />
     <Compile Include="MessageHandler\MessageInvokeHandlerFive.cs" />
     <Compile Include="MessageHandler\MessageInvokeHandlerFour.cs" />
@@ -97,6 +106,10 @@
     <Compile Include="PushNotification\Google\GooglePushNotification.cs" />
     <Compile Include="PushNotification\IPushNotification.cs" />
     <Compile Include="Random\ServerRandom.cs" />
+    <Compile Include="Serialize\ProtobufNet\ProtobufNetUtility.cs" />
+    <Compile Include="Serialize\XML\XmlSerializeUtility.cs" />
+    <Compile Include="SimpleImage\SimpleImageBase.cs" />
+    <Compile Include="SimpleImage\SimpleImage.cs" />
     <Compile Include="ThreadPool\AppDomainThreadPoolManager.cs" />
     <Compile Include="Log\FileLog.cs" />
     <Compile Include="Log\FileLogFactory.cs" />
