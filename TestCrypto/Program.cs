@@ -53,7 +53,7 @@ namespace TestCrypto
 
         private static void TestAES256()
         {
-            AES256 aes = new AES256("1234567890123456789012");
+            AES256 aes = new AES256("12345678901234567890123456789012");
             byte[] encData = aes.Encrypt("test", Encoding.UTF8);
             string decString = aes.Decrypt(encData, Encoding.UTF8);
         }

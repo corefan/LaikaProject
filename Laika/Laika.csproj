@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crash\CrashHandler.cs" />
+    <Compile Include="Crash\MiniDump.cs" />
     <Compile Include="Crypto\AES256.cs" />
     <Compile Include="Crypto\SHA1.cs" />
     <Compile Include="Crypto\MD5.cs" />

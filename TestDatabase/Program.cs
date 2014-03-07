@@ -132,12 +132,12 @@ namespace TestDatabase
             TestAsyncTransactionJob(db);
             TestSyncTransactionJob(db);
             TestRollbackTransactionJob(db);
-            TestMultiTransaction(db);
+            TestManualCommitTransaction(db);
 
             return db;
         }
 
-        private static void TestMultiTransaction(IDatabase db)
+        private static void TestManualCommitTransaction(IDatabase db)
         {
             MySqlDbJob job = MySqlDbJob.CreateMySqlTransactionJob(transactionContext => 
             {
