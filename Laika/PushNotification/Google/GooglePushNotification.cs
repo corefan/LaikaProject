@@ -83,7 +83,7 @@ namespace Laika.PushNotification
                 result = reader.ReadToEnd();
             }
 
-            response.Dispose();
+            //response.Dispose();
         }
     }
 }

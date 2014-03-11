@@ -5,13 +5,6 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laika", "Laika\Laika.csproj", "{5B17F254-F40A-4069-908D-339E67B9482E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{05A5C2A4-DC23-4E8B-8139-B626E5C1CFAB}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCrashLog", "TestCrashLog\TestCrashLog.csproj", "{82707FC7-1720-4E81-B8A1-2128140F04A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCrypto", "TestCrypto\TestCrypto.csproj", "{F1AE90B8-96AF-4603-9B88-B6F2BA9BDB0D}"
@@ -39,6 +32,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSerialize", "TestSerialize\TestSerialize.csproj", "{20860393-E91C-40A9-8BA8-DF1354236A98}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestImage", "TestImage\TestImage.csproj", "{E4A28C78-75E0-4CF9-967B-BB03D3861710}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6180D5DC-FC36-483C-B736-CC24D70FC2D9}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
