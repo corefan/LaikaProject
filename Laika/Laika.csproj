@@ -83,6 +83,7 @@
     <Compile Include="ExtendBundle\ExtendArray.cs" />
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
+    <Compile Include="Log\EventLog.cs" />
     <Compile Include="SimpleImage\SimpleBitmap.cs" />
     <Compile Include="MessageHandler\MessageHandlerAttribute.cs" />
     <Compile Include="MessageHandler\MessageInvokeHandlerFive.cs" />

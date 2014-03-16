@@ -30,6 +30,10 @@ namespace Laika.Log
             {
                 return new TimeLog(param);
             }
+            else if (param.Type == PartitionType.WINDOWS_EVENT)
+            {
+                return new EventLog(param);
+            }
             else
                 throw new ArgumentException("Invalid partition type.");
         }

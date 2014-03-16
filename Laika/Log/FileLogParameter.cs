@@ -9,7 +9,7 @@ namespace Laika.Log
 {
     public class FileLogParameter
     {
-        public FileLogParameter(string path = null, PartitionType type = PartitionType.NONE, string fileName = "log", int time = 60, int size = 1024000, bool debug = false, bool console = false, bool trace = false)
+        public FileLogParameter(string path = null, PartitionType type = PartitionType.NONE, string fileName = "log", int time = 60, int size = 1024000, bool debug = false, bool console = false, bool trace = false, string windowsEventSource = "ApplicationSource")
         {
             if (path == null)
                 path = Directory.GetCurrentDirectory();
@@ -22,6 +22,7 @@ namespace Laika.Log
             Size = size;
             PrintConsole = console;
             UsingTrace = trace;
+            WindowsEventSource = windowsEventSource;
         }
 
         /// <summary>
@@ -56,5 +57,9 @@ namespace Laika.Log
         /// Trace 사용 여부
         /// </summary>
         public bool UsingTrace { get; set; }
+        /// <summary>
+        /// Event log source
+        /// </summary>
+        public string WindowsEventSource { get; set; }
     }
 }

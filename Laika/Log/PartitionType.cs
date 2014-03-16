@@ -24,6 +24,10 @@ namespace Laika.Log
         /// 파일 사이즈별 로그. 단위는 바이트(Byte)이며, 
         /// 파일이 지정한 사이즈 이상 넘어갈 경우 새로운 파일을 만듭니다.
         /// </summary>
-        FILE_SIZE
+        FILE_SIZE,
+        /// <summary>
+        /// 윈도우즈 이벤트 로그. 관리자 권한이 필요합니다.
+        /// </summary>
+        WINDOWS_EVENT,
     }
 }

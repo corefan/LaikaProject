@@ -23,6 +23,8 @@ namespace TestLog
             //param.Size = 1000000; // 1,000,000 bytes, 파일 사이즈가 1,000,000 바이트를 넘어가면.
             //param.Type = PartitionType.TIME; // 파일을 생성 후 일정 시간이 넘어가면 두번째 파일을 생성함.
             //param.Time = 10 // 10 min., 10분으로 설정
+            //param.Type = PartitionType.WINDOWS_EVENT; 윈도우즈 이벤트 로그
+            //param.WindowsEventSource = "TestApplication"; 윈도우즈 이벤트 로그 이벤트 소스
 
             // Thread safety함.
             IFileLog log = FileLogFactory.CreateFileLog(param);
