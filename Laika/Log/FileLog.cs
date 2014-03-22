@@ -68,7 +68,7 @@ namespace Laika.Log
         }
 
         protected abstract string GetFileName();
-        protected abstract bool NeedCreateFile();
+        protected abstract bool NeedCreateFile(); 
 
         private void Initialize()
         {
@@ -106,9 +106,13 @@ namespace Laika.Log
                 if (NeedCreateFile() == true)
                 {
                     FileInitialize();
+                    WriteSize = 0;
                 }
 
                 _logStreamWriter.WriteLine(item);
+                
+                if (Param.Type == PartitionType.FILE_SIZE)
+                    WriteSize += (item.LongCount() + 1);
 
                 if (Param.PrintConsole == true)
                 {
@@ -172,5 +176,6 @@ namespace Laika.Log
         private Thread _workerThread;
 
         protected FileLogParameter Param;
+        protected long WriteSize = 0;
     }
 }
