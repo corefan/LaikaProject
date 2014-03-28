@@ -37,12 +37,11 @@ namespace Laika.Net
 
             if (message.sockets != null && message.sockets.Count <= 0)
             {
-                message.sockets.ForEach(x => 
+                Parallel.ForEach(message.sockets, socket => 
                 {
-                    if (x.Connected == true)
-                        SendMessageToSocket(x, sendData);
+                    if (socket.Connected == true)
+                        SendMessageToSocket(socket, sendData);
                 });
-
                 message.sockets.Clear();
             }
         }
