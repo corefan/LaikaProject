@@ -15,47 +15,48 @@ namespace Laika.Net
         where bodyT : class, IBody, new()
     {
         internal event ReceiveHandle ReceivedMessage;
-        internal delegate void ReceiveHandle(IMessage message);
+        internal delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
 
-        internal event ExceptionSocketHandle OccuredExceptionFromSocket;
-        internal delegate void ExceptionSocketHandle(Socket socket, Exception ex);
+        internal event ExceptionSessionHandle OccuredExceptionFromSession;
+        internal delegate void ExceptionSessionHandle(object sender, ExceptionFromSessionEventArgs e);
 
-        internal event DisconnectedSocketHandle DisconnectedSocket;
-        internal delegate void DisconnectedSocketHandle(Socket socket);
+        internal event DisconnectedSocketHandle DisconnectedSession;
+        internal delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
 
-        internal void BeginReceive(Socket socket)
+        internal void BeginReceive(Session session)
         {
-            if (socket == null)
+            if (session == null || session.Handle == null)
                 return;
-            SocketAsyncEventArgs e = null;
+
+            SocketAsyncEventArgs receiveEventArg = null;
             try
             {
-                e = new SocketAsyncEventArgs();
+                receiveEventArg = new SocketAsyncEventArgs();
                 messageT message = new messageT();
-                message.socket = socket;
+                message.Session = session;
                 message.Header = new headerT();
                 message.Header.HeaderRawData = new byte[message.Header.GetHeaderSize()];
-                e.UserToken = message;
-                e.SetBuffer(message.Header.HeaderRawData, 0, message.Header.HeaderRawData.Length);
-                e.Completed += ReceiveHeaderCompleted;
+                receiveEventArg.UserToken = message;
+                receiveEventArg.SetBuffer(message.Header.HeaderRawData, 0, message.Header.HeaderRawData.Length);
+                receiveEventArg.Completed += ReceiveHeaderCompleted;
 
-                socket.ReceiveAsync(e);
+                session.Handle.ReceiveAsync(receiveEventArg);
             }
             catch (Exception ex)
             {
-                CleanArgument(e);
-                if (OccuredExceptionFromSocket != null)
-                    OccuredExceptionFromSocket(socket, ex);
+                CleanArgument(receiveEventArg);
+                if (OccuredExceptionFromSession != null)
+                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
         private void ReceiveHeaderCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = sender as Socket;
             messageT message = e.UserToken as messageT;
+            Session session = message.Session;
             try
             {
-                if (socket == null)
+                if (session.Handle == null)
                     throw new ArgumentNullException();
 
                 int transferred = e.BytesTransferred;
@@ -63,8 +64,8 @@ namespace Laika.Net
                 
                 if (transferred <= 0)
                 {
-                    if (DisconnectedSocket != null)
-                        DisconnectedSocket(socket);
+                    if (DisconnectedSession != null)
+                        DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
                     CleanArgument(e);
                     return;
@@ -73,7 +74,7 @@ namespace Laika.Net
                 {
                     e.SetBuffer(message.Header.HeaderRawData, message.Header.BytesTransferred, message.Header.GetHeaderSize() - message.Header.BytesTransferred);
 
-                    socket.ReceiveAsync(e);
+                    session.Handle.ReceiveAsync(e);
                 }
                 else if (message.Header.BytesTransferred == message.Header.GetHeaderSize())
                 {
@@ -88,7 +89,7 @@ namespace Laika.Net
                     e.Completed -= ReceiveHeaderCompleted;
                     e.Completed += ReceiveBodyCompleted;
 
-                    socket.ReceiveAsync(e);
+                    session.Handle.ReceiveAsync(e);
                 }
                 else
                 {
@@ -99,18 +100,18 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 CleanArgument(e);
-                if (OccuredExceptionFromSocket != null)
-                    OccuredExceptionFromSocket(socket, ex);
+                if (OccuredExceptionFromSession != null)
+                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
         private void ReceiveBodyCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = sender as Socket;
             messageT message = e.UserToken as messageT;
+            Session session = message.Session;
             try
             {
-                if (socket == null)
+                if (session == null || session.Handle == null)
                     throw new ArgumentNullException();
 
                 int transferred = e.BytesTransferred;
@@ -118,8 +119,8 @@ namespace Laika.Net
 
                 if (transferred <= 0)
                 {
-                    if (DisconnectedSocket != null)
-                        DisconnectedSocket(socket);
+                    if (DisconnectedSession != null)
+                        DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
                     CleanArgument(e);
                     return;
@@ -128,16 +129,16 @@ namespace Laika.Net
                 {
                     e.SetBuffer(message.Body.BodyRawData, message.Body.BytesTransferred, message.Header.ContentsSize - message.Body.BytesTransferred);
 
-                    socket.ReceiveAsync(e);
+                    session.Handle.ReceiveAsync(e);
                 }
                 else if (message.Body.BytesTransferred == message.Header.ContentsSize)
                 {
                     CleanArgument(e);
 
                     if (ReceivedMessage != null)
-                        ReceivedMessage(message);
+                        ReceivedMessage(this, new ReceivedMessageEventArgs(message));
 
-                    BeginReceive(socket);
+                    BeginReceive(session);
                 }
                 else
                 {
@@ -148,8 +149,8 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 CleanArgument(e);
-                if (OccuredExceptionFromSocket != null)
-                    OccuredExceptionFromSocket(socket, ex);
+                if (OccuredExceptionFromSession != null)
+                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 

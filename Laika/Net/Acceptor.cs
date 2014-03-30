@@ -17,7 +17,9 @@ namespace Laika.Net
         }
         internal void NewAccept()
         {
+            Session session = new Session();
             SocketAsyncEventArgs acceptArgs = new SocketAsyncEventArgs();
+            acceptArgs.UserToken = session;
             acceptArgs.Completed += AcceptCompleted;
             try
             {
@@ -25,19 +27,20 @@ namespace Laika.Net
             }
             catch (Exception ex)
             {
-                if (OccuredExceptionFromSocket != null)
-                    OccuredExceptionFromSocket(ex);
+                if (OccuredExceptionFromAccept != null)
+                    OccuredExceptionFromAccept(this, new ExceptionEventArgs(ex));
             }
         }
 
         internal void AcceptCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket client = e.AcceptSocket;
+            Session session = (Session)e.UserToken;
+            session.Handle = e.AcceptSocket;
             NewAccept();
 
             CleanArgument(e);
-            if (ConnectedClient != null)
-                ConnectedClient(client);
+            if (ConnectedSession != null)
+                ConnectedSession(this, new AcceptEventArgs(session));
         }
 
         private void CleanArgument(SocketAsyncEventArgs e)
@@ -51,10 +54,10 @@ namespace Laika.Net
 
         private Socket _acceptingSocket;
 
-        internal event ConnectedHandle ConnectedClient;
-        internal delegate void ConnectedHandle(Socket socket);
+        internal event ConnectedHandle ConnectedSession;
+        internal delegate void ConnectedHandle(object sender, AcceptEventArgs e);
 
-        internal event ExceptionSocketHandle OccuredExceptionFromSocket;
-        internal delegate void ExceptionSocketHandle(Exception ex);
+        internal event ExceptionSocketHandle OccuredExceptionFromAccept;
+        internal delegate void ExceptionSocketHandle(object sender, ExceptionEventArgs e);
     }
 }

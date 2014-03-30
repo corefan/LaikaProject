@@ -87,6 +87,13 @@
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
     <Compile Include="Log\EventLog.cs" />
+    <Compile Include="Net\EventArgs\AcceptEventArgs.cs" />
+    <Compile Include="Net\EventArgs\ConnectedSessionEventArgs.cs" />
+    <Compile Include="Net\EventArgs\DisconnectSocketEventArgs.cs" />
+    <Compile Include="Net\EventArgs\ExceptionEventArgs.cs" />
+    <Compile Include="Net\EventArgs\ExceptionFromSessionEventArgs.cs" />
+    <Compile Include="Net\EventArgs\ReceivedMessageEventArgs.cs" />
+    <Compile Include="Net\Session.cs" />
     <Compile Include="Serialize\MessagePack\MessagePackUtility.cs" />
     <Compile Include="SimpleImage\SimpleBitmap.cs" />
     <Compile Include="MessageHandler\MessageHandlerAttribute.cs" />

@@ -79,11 +79,10 @@ namespace Laika.Net
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        public void SendMessage(IMessage message)
+        public void SendMessage(Session session, IMessage message)
         {
-            _sender.SendAsync(message);
+            _sender.SendAsync(session, message);
         }
-
         private void InitializeServer()
         {
             _listenerSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -100,58 +99,62 @@ namespace Laika.Net
         {
             _receiver = new Receiver<messageT, headerT, bodyT>();
             _receiver.ReceivedMessage += ReceivedMessage;
-            _receiver.OccuredExceptionFromSocket += OccuredExceptionClient;
-            _receiver.DisconnectedSocket += DisconnectedSocket;
+            _receiver.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _receiver.DisconnectedSession += DisconnectedSession;
         }
 
-        private void DisconnectedSocket(Socket client)
+        void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
         {
-            if (client != null)
+            if (e.SessionHandle.Handle != null)
             {
-                client.Close();
-                client.Dispose();
+                e.SessionHandle.Handle.Close();
+                e.SessionHandle.Handle.Dispose();
             }
         }
-        private void OccuredExceptionClient(Socket client, Exception ex)
+
+        private void OccuredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
-            if (client != null)
+            if (e.SessionHandle.Handle != null)
             {
-                client.Close();
-                client.Dispose();
+                e.SessionHandle.Handle.Close();
+                e.SessionHandle.Handle.Dispose();
             }
 
-            OccuredExceptionSocket(ex);
+            this.OccuredError(this, new ExceptionEventArgs(e.Exception));
         }
-        private void ReceivedMessage(IMessage message)
+
+        private void ReceivedMessage(object sender, ReceivedMessageEventArgs e)
         {
-            if (ReceivedMessageFromClient != null)
-                ReceivedMessageFromClient(message.socket, message);
+            if (ReceivedMessageFromSession != null)
+                ReceivedMessageFromSession(this, e);
         }
         private void InitializeSender()
         {
             _sender = new Sender<messageT, headerT, bodyT>();
-            _sender.OccuredExceptionFromSocket += OccuredExceptionClient;
-            _sender.DisconnectedSocket += DisconnectedSocket;
+            _sender.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _sender.DisconnectedSession += DisconnectedSession;
         }
 
         private void InitializeAcceptor()
         {
             _acceptor = new Acceptor(_listenerSocket);
-            _acceptor.ConnectedClient += ConnectedClient;
-            _acceptor.OccuredExceptionFromSocket += OccuredExceptionSocket;
+            _acceptor.ConnectedSession += ConnectedSession;
+            _acceptor.OccuredExceptionFromAccept += OccuredExceptionFromAccept;
             _acceptor.NewAccept();
         }
 
-        private void ConnectedClient(Socket socket)
+        private void ConnectedSession(object sender, AcceptEventArgs e)
         {
-            ConnectedSocket(socket);
-            _receiver.BeginReceive(socket);
+            if (ConnectedSessionEvent != null)
+                ConnectedSessionEvent(this, new ConnectedSessionEventArgs(e.SessionHandle));
+
+            _receiver.BeginReceive(e.SessionHandle);
         }
 
-        private void OccuredExceptionSocket(Exception ex)
+        private void OccuredExceptionFromAccept(object sender, ExceptionEventArgs e)
         {
             if (OccuredError != null)
-                OccuredError(ex);
+                OccuredError(this, e);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -183,13 +186,13 @@ namespace Laika.Net
         private Receiver<messageT, headerT, bodyT> _receiver;
         private Sender<messageT, headerT, bodyT> _sender;
 
-        public event ReceiveHandle ReceivedMessageFromClient;
-        public delegate void ReceiveHandle(Socket socket, IMessage message);
+        public event ReceiveHandle ReceivedMessageFromSession;
+        public delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
 
         public event ErrorHandle OccuredError;
-        public delegate void ErrorHandle(Exception ex);
+        public delegate void ErrorHandle(object sender, ExceptionEventArgs e);
 
-        public event ConnectHandle ConnectedSocket;
-        public delegate void ConnectHandle(Socket socket);
+        public event ConnectHandle ConnectedSessionEvent;
+        public delegate void ConnectHandle(object sender, ConnectedSessionEventArgs e);
     }
 }

@@ -36,13 +36,13 @@ namespace Laika.Net
         public void SendAsync(IMessage message)
         {
             _connectWait.WaitOne();
-            message.socket = _socket;
-            _sender.SendAsync(message);
+            _sender.SendAsync(_session, message);
         }
 
         private void InitializeClient()
         {
-            _socket = new Socket(_remoteEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _session = new Session();
+            _session.Handle = new Socket(_remoteEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             InitializeConnector();
             InitializeSender();
             InitializeReceiver();
@@ -51,53 +51,50 @@ namespace Laika.Net
         private void InitializeReceiver()
         {
             _receiver = new Receiver<messageT, headerT, bodyT>();
-            _receiver.DisconnectedSocket += DisconnectedSocketFromServer;
-            _receiver.OccuredExceptionFromSocket += OccuredExceptionFromSocket;
+            _receiver.DisconnectedSession += DisconnectedSession;
+            _receiver.OccuredExceptionFromSession += OccuredExceptionFromSession;
             _receiver.ReceivedMessage += ReceivedMessageFromServer;
-            _receiver.BeginReceive(_socket);
+            _receiver.BeginReceive(_session);
         }
 
-        private void ReceivedMessageFromServer(IMessage message)
+        private void OccuredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
+        {
+            if (e.SessionHandle.Handle != null)
+            {
+                e.SessionHandle.Handle.Close();
+                e.SessionHandle.Handle.Dispose();
+            }
+            if (OccuredException != null)
+                OccuredException(this, e);
+        }
+
+        private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
+        {
+            if (DisconnectedSessionEvent != null)
+                DisconnectedSessionEvent(this, e);
+        }
+
+        private void ReceivedMessageFromServer(object sender, ReceivedMessageEventArgs e)
         {
             if (ReceivedMessage != null)
-                ReceivedMessage(message);
+                ReceivedMessage(this, e);
         }
-
-        
-
-        private void OccuredExceptionFromSocket(Socket socket, Exception e)
-        {
-            if (socket != null)
-            {
-                socket.Close();
-                socket.Dispose();
-            }
-
-            if (OccuredException != null)
-                OccuredException(e);
-        }
-
-        private void DisconnectedSocketFromServer(Socket socket)
-        {
-            if (DisconnectedSocket != null)
-                DisconnectedSocket(socket);
-        }
-
+                                
         private void InitializeSender()
         {
             _sender = new Sender<messageT, headerT, bodyT>();
-            _sender.DisconnectedSocket += DisconnectedSocketFromServer;
-            _sender.OccuredExceptionFromSocket += OccuredExceptionFromSocket;
+            _sender.DisconnectedSession += DisconnectedSession;
+            _sender.OccuredExceptionFromSession += OccuredExceptionFromSession;
         }
 
         private void InitializeConnector()
         {
             _connector = new Connector();
-            _connector.ConnectedSocket += ConnectedSocket;
-            _connector.ConnectAsync(_socket, _remoteEndPoint);
+            _connector.ConnectedSession += ConnectedSession;
+            _connector.ConnectAsync(_session, _remoteEndPoint);
         }
 
-        private void ConnectedSocket()
+        private void ConnectedSession(object sender, ConnectedSessionEventArgs e)
         {
             _connectWait.Set();
         }
@@ -126,10 +123,10 @@ namespace Laika.Net
 
         private void Clear()
         {
-            if (_socket != null)
+            if (_session != null && _session.Handle != null)
             {
-                _socket.Shutdown(SocketShutdown.Both);
-                _socket.Dispose();
+                _session.Handle.Shutdown(SocketShutdown.Both);
+                _session.Handle.Dispose();
             }
         }
 
@@ -139,7 +136,8 @@ namespace Laika.Net
             _remoteEndPoint = new IPEndPoint(address, port);
         }
 
-        private Socket _socket;
+        private Session _session;
+        //private Socket _socket;
         private IPEndPoint _remoteEndPoint;
         private bool _disposed = false;
         private ManualResetEvent _clientWait = new ManualResetEvent(false);
@@ -148,13 +146,13 @@ namespace Laika.Net
         private Sender<messageT, headerT, bodyT> _sender;
         private Receiver<messageT, headerT, bodyT> _receiver;
 
-        public event DisconnectedSocketHandle DisconnectedSocket;
-        public delegate void DisconnectedSocketHandle(Socket socket);
+        public event DisconnectedSocketHandle DisconnectedSessionEvent;
+        public delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
 
         public event SocketExceptionHandle OccuredException;
-        public delegate void SocketExceptionHandle(Exception ex);
+        public delegate void SocketExceptionHandle(object sender, ExceptionFromSessionEventArgs e);
 
         public event ReceiveHandle ReceivedMessage;
-        public delegate void ReceiveHandle(IMessage message);
+        public delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
     }
 }

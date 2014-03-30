@@ -9,23 +9,24 @@ namespace Laika.Net
 {
     internal class Connector
     {
-        internal void ConnectAsync(Socket socket, IPEndPoint endPoint)
+        internal void ConnectAsync(Session session, IPEndPoint endPoint)
         {
-            if (socket == null || endPoint == null)
+            if (session == null || session.Handle == null || endPoint == null)
                 throw new ArgumentNullException();
 
             SocketAsyncEventArgs e = new SocketAsyncEventArgs();
             e.RemoteEndPoint = endPoint;
             e.Completed += ConnectCompleted;
-
-            socket.ConnectAsync(e);
+            e.UserToken = session;
+            session.Handle.ConnectAsync(e);
         }
 
         private void ConnectCompleted(object sender, SocketAsyncEventArgs e)
         {
+            Session session = (Session)e.UserToken;
             CleanArgument(e);
-            if (ConnectedSocket != null)
-                ConnectedSocket();
+            if (ConnectedSession != null)
+                ConnectedSession(this, new ConnectedSessionEventArgs(session));
         }
 
         private void CleanArgument(SocketAsyncEventArgs e)
@@ -37,7 +38,7 @@ namespace Laika.Net
             }
         }
 
-        internal event ConnectHandle ConnectedSocket;
-        internal delegate void ConnectHandle();
+        internal event ConnectHandle ConnectedSession;
+        internal delegate void ConnectHandle(object sender, ConnectedSessionEventArgs e);
     }
 }

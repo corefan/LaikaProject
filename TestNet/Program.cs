@@ -31,32 +31,13 @@ namespace TestNet
     {
         public IHeader Header { get; set; }
         public IBody Body { get; set; }
-        public Socket socket { get; set; }
-        public List<Socket> sockets { get; set; }
-        
-        public void SetMessage(List<Socket> receivers, byte[] bodyRawData)
-        {
-            sockets = receivers;
-            SetData(bodyRawData);
-        }
-
-        private void SetData(byte[] bodyRawData)
-        {
-            Body = new Body();
-            Body.BodyRawData = bodyRawData;
-            Header = new Header();
-            Header.HeaderRawData = BitConverter.GetBytes(bodyRawData.Length);
-        }
-
-        public void SetMessage(Socket receiver, byte[] bodyRawData)
-        {
-            socket = receiver;
-            SetData(bodyRawData);
-        }
-
+        public Session Session { get; set; }
         public void SetMessage(byte[] bodyRawData)
         {
-            SetData(bodyRawData);
+            Header = new Header();
+            Body = new Body();
+            Header.HeaderRawData = BitConverter.GetBytes(bodyRawData.Length);
+            Body.BodyRawData = bodyRawData;
         }
     }
 
@@ -75,62 +56,62 @@ namespace TestNet
         private static void SetTcpClient()
         {
             client = new LaikaTcpClient<Message, Header, Body>("127.0.0.1", 10000);
-            client.DisconnectedSocket += client_DisconnectedSocket;
+            client.DisconnectedSessionEvent += client_DisconnectedSessionEvent;
             client.OccuredException += client_OccuredException;
             client.ReceivedMessage += client_ReceivedMessage;
             client.Poll();
             Message m = new Message();
             m.SetMessage(Encoding.UTF8.GetBytes("Hello!"));
             client.SendAsync(m);
-            Task.Factory.StartNew(() => 
+            Task.Factory.StartNew(() =>
             {
                 System.Threading.Thread.Sleep(1000);
                 client.Dispose();
             });
         }
 
-        static void client_ReceivedMessage(IMessage message)
+        static void client_ReceivedMessage(object sender, ReceivedMessageEventArgs e)
         {
-            string result = Encoding.UTF8.GetString(message.Body.BodyRawData);
+            string result = Encoding.UTF8.GetString(e.Message.Body.BodyRawData);
             Console.WriteLine(result);
         }
 
-        static void client_OccuredException(Exception ex)
+        static void client_OccuredException(object sender, ExceptionFromSessionEventArgs e)
         {
-            Console.WriteLine("Client Occured Exception {0}", ex.ToString());
+            Console.WriteLine("Client Occured Exception {0}", e.Exception.ToString());
         }
 
-        static void client_DisconnectedSocket(Socket socket)
+        static void client_DisconnectedSessionEvent(object sender, DisconnectSocketEventArgs e)
         {
-            Console.WriteLine("socket disconnected. {0}", socket.Handle.ToInt32());
+            Console.WriteLine("socket disconnected. {0}", e.SessionHandle.Handle.Handle.ToInt32());
         }
-        
+                        
         private static void SetTcpServer()
         {
             server = new LaikaTcpServer<Message, Header, Body>(10000);
-            server.ConnectedSocket += server_ConnectedSocket;
+            server.ConnectedSessionEvent += server_ConnectedSocket;
             server.OccuredError += server_OccuredError;
-            server.ReceivedMessageFromClient += server_ReceivedMessageFromClient;
+            server.ReceivedMessageFromSession += server_ReceivedMessageFromSession;
             server.Poll();
         }
 
-        static void server_ReceivedMessageFromClient(Socket socket, IMessage message)
+        static void server_ReceivedMessageFromSession(object sender, ReceivedMessageEventArgs e)
         {
-            Console.WriteLine("Received : {0}", Encoding.UTF8.GetString(message.Body.BodyRawData));
+            Console.WriteLine("Received : {0}", Encoding.UTF8.GetString(e.Message.Body.BodyRawData));
             Message m = new Message();
             string result = "I got it.";
-            m.SetMessage(socket, Encoding.UTF8.GetBytes(result));
-            server.SendMessage(m);
+            m.SetMessage(Encoding.UTF8.GetBytes(result));
+            server.SendMessage(e.Message.Session, m);
         }
 
-        static void server_OccuredError(Exception ex)
+        static void server_ConnectedSocket(object sender, ConnectedSessionEventArgs e)
         {
-            Console.WriteLine("Ocurred Error : {0}", ex.ToString());
+            Console.WriteLine("Connected : {0}", e.SessionHandle.Handle.Handle.ToInt32());
         }
-
-        static void server_ConnectedSocket(Socket socket)
+        
+        static void server_OccuredError(object sender, ExceptionEventArgs e)
         {
-            Console.WriteLine("Connected : {0}", socket.Handle.ToInt32());
+            Console.WriteLine("Ocurred Error : {0}", e.Exception.ToString());
         }
     }
 }

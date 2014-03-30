@@ -15,58 +15,27 @@ namespace Laika.Net
         where headerT : class, IHeader, new()
         where bodyT : class, IBody, new()
     {
-        internal void SendAsync(IMessage message)
-        {
-            if (message == null)
-                return;
-            if (message.socket == null && (message.sockets == null || message.sockets.Count <= 0))
-                return;
-            if (message.Header == null || message.Header.HeaderRawData == null || message.Header.HeaderRawData.Length <= 0)
-                return;
-            if (message.Body == null || message.Body.BodyRawData == null || message.Body.BodyRawData.Length <= 0 || message.Body.BodyRawData.Length > LaikaConfig.MaxBodySize)
-                return;
-
-            byte[] sendData = new byte[message.Header.HeaderRawData.Length + message.Body.BodyRawData.Length];
-            message.Header.HeaderRawData.CopyTo(sendData, 0);
-            message.Body.BodyRawData.CopyTo(sendData, message.Header.HeaderRawData.Length);
-
-            if (message.socket != null)
-            {
-                SendMessageToSocket(message.socket, sendData);
-            }
-
-            if (message.sockets != null && message.sockets.Count <= 0)
-            {
-                Parallel.ForEach(message.sockets, socket => 
-                {
-                    if (socket.Connected == true)
-                        SendMessageToSocket(socket, sendData);
-                });
-                message.sockets.Clear();
-            }
-        }
-
-        private void SendMessageToSocket(Socket socket, byte[] sendData)
+        private void SendMessageToSocket(Session session, byte[] sendData)
         {
             SendContext context = new SendContext();
             context.SendData = sendData;
+            context.Session = session;
 
             SocketAsyncEventArgs e = new SocketAsyncEventArgs();
             e.SetBuffer(context.SendData, 0, context.SendData.Length);
             e.UserToken = context;
             e.Completed += SendCompleted;
 
-            socket.SendAsync(e);
+            session.Handle.SendAsync(e);
         }
 
         private void SendCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Socket socket = sender as Socket;
             SendContext context = e.UserToken as SendContext;
-
+            Session session = context.Session;
             try
             {
-                if (socket == null)
+                if (session.Handle == null)
                     throw new ArgumentNullException();
 
                 int bytesTransferred = e.BytesTransferred;
@@ -74,8 +43,8 @@ namespace Laika.Net
 
                 if (bytesTransferred <= 0)
                 {
-                    if (DisconnectedSocket != null)
-                        DisconnectedSocket(socket);
+                    if (DisconnectedSession != null)
+                        DisconnectedSession(this, new DisconnectSocketEventArgs(session));
 
                     CleanArgument(e, context);
                     return;
@@ -85,7 +54,7 @@ namespace Laika.Net
                     e.UserToken = context;
                     e.SetBuffer(context.SendData, context.BytesTransferred, context.SendData.Length - context.BytesTransferred);
 
-                    socket.SendAsync(e);
+                    session.Handle.SendAsync(e);
                 }
                 else if (context.BytesTransferred == context.SendData.Length)
                 {
@@ -99,8 +68,8 @@ namespace Laika.Net
             }
             catch (Exception ex)
             {
-                if (OccuredExceptionFromSocket != null)
-                    OccuredExceptionFromSocket(socket, ex);
+                if (OccuredExceptionFromSession != null)
+                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
@@ -119,16 +88,75 @@ namespace Laika.Net
             }
         }
 
-        internal event ExceptionSocketHandle OccuredExceptionFromSocket;
-        internal delegate void ExceptionSocketHandle(Socket socket, Exception e);
+        internal event ExceptionSocketHandle OccuredExceptionFromSession;
+        internal delegate void ExceptionSocketHandle(object sender, ExceptionFromSessionEventArgs e);
 
-        internal event DisconnectedSocketHandle DisconnectedSocket;
-        internal delegate void DisconnectedSocketHandle(Socket socket);
+        internal event DisconnectedSocketHandle DisconnectedSession;
+        internal delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
 
         internal class SendContext
         {
             internal int BytesTransferred { get; set; }
             internal byte[] SendData { get; set; }
+            internal Session Session { get; set; }
+        }
+
+        internal void SendAsync(Session session, IMessage message)
+        {
+            if (CheckSession(session) == false)
+                return;
+            if (CheckMessage(message) == false)
+                return;
+            SendMessageToSocket(session, GetData(message));
+        }
+
+        private bool CheckMessage(IMessage message)
+        {
+            if (message == null
+                || message.Header == null
+                || message.Header.HeaderRawData == null
+                || message.Body == null
+                || message.Body.BodyRawData == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private byte[] GetData(IMessage message)
+        {
+            byte[] sendData = new byte[message.Header.HeaderRawData.Length + message.Body.BodyRawData.Length];
+            message.Header.HeaderRawData.CopyTo(sendData, 0);
+            message.Body.BodyRawData.CopyTo(sendData, message.Header.HeaderRawData.Length);
+
+            return sendData;
+        }
+
+        private bool CheckSession(Session session)
+        {
+            if (session == null || session.Handle == null)
+                return false;
+
+            return true;
+        }
+
+        internal void SendAsync(IEnumerable<Session> sessionList, IMessage message)
+        {
+            bool validSession = sessionList.All(session => CheckSession(session));
+
+            if (validSession == false)
+                return;
+            
+            if (CheckMessage(message) == false)
+                return;
+            
+            byte[] sendData = GetData(message);
+            
+            Parallel.ForEach(sessionList, session => 
+            {
+                SendMessageToSocket(session, sendData);
+            });
         }
     }
 }
