@@ -43,14 +43,16 @@ namespace TestNet
 
     class Program
     {
-        static LaikaTcpServer<Message, Header, Body> server = null;
-        static LaikaTcpClient<Message, Header, Body> client = null;
+        static ILaikaServer server = null;
+        static ILaikaClient client = null;
 
         static void Main(string[] args)
         {
             SetTcpServer();
             SetTcpClient();
             Console.ReadKey();
+            client.Dispose();
+            server.Dispose();
         }
 
         private static void SetTcpClient()
@@ -59,7 +61,7 @@ namespace TestNet
             client.DisconnectedSessionEvent += client_DisconnectedSessionEvent;
             client.OccuredException += client_OccuredException;
             client.ReceivedMessage += client_ReceivedMessage;
-            client.Poll();
+            client.NonBlockingStart();
             Message m = new Message();
             m.SetMessage(Encoding.UTF8.GetBytes("Hello!"));
             client.SendAsync(m);
@@ -92,7 +94,7 @@ namespace TestNet
             server.ConnectedSessionEvent += server_ConnectedSocket;
             server.OccuredError += server_OccuredError;
             server.ReceivedMessageFromSession += server_ReceivedMessageFromSession;
-            server.Poll();
+            server.NonblockingStart();
         }
 
         static void server_ReceivedMessageFromSession(object sender, ReceivedMessageEventArgs e)

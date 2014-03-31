@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Laika.Event
 {
@@ -71,10 +69,10 @@ namespace Laika.Event
             return _taskTable.TryAdd(eventName, ts);
         }
 
-        private void EndTask(string eventName)
+        private void EndTask(object sender, TaskServiceEndEventArgs e)
         {
             TaskService ts = null;
-            _taskTable.TryRemove(eventName, out ts);
+            _taskTable.TryRemove(e.TaskServiceName, out ts);
         }
 
         private object _disposeLock = new object();

@@ -80,6 +80,7 @@
     <Compile Include="Data\Json\JsonToObject.cs" />
     <Compile Include="Data\Json\MiniJson.cs" />
     <Compile Include="Data\Xml\XmlUtility.cs" />
+    <Compile Include="EventArgs\TaskServiceEndEventArgs.cs" />
     <Compile Include="Event\Event.cs" />
     <Compile Include="Event\EventScheduler.cs" />
     <Compile Include="Event\TaskService.cs" />
@@ -87,12 +88,15 @@
     <Compile Include="ExtendBundle\ExtendCollections.cs" />
     <Compile Include="ExtendBundle\ExtendDateTime.cs" />
     <Compile Include="Log\EventLog.cs" />
-    <Compile Include="Net\EventArgs\AcceptEventArgs.cs" />
-    <Compile Include="Net\EventArgs\ConnectedSessionEventArgs.cs" />
-    <Compile Include="Net\EventArgs\DisconnectSocketEventArgs.cs" />
-    <Compile Include="Net\EventArgs\ExceptionEventArgs.cs" />
-    <Compile Include="Net\EventArgs\ExceptionFromSessionEventArgs.cs" />
-    <Compile Include="Net\EventArgs\ReceivedMessageEventArgs.cs" />
+    <Compile Include="EventArgs\AcceptEventArgs.cs" />
+    <Compile Include="EventArgs\ConnectedSessionEventArgs.cs" />
+    <Compile Include="EventArgs\DisconnectSocketEventArgs.cs" />
+    <Compile Include="EventArgs\ExceptionEventArgs.cs" />
+    <Compile Include="EventArgs\ExceptionFromSessionEventArgs.cs" />
+    <Compile Include="EventArgs\ReceivedMessageEventArgs.cs" />
+    <Compile Include="EventHandler\LaikaEventHandler.cs" />
+    <Compile Include="Net\ILaikaClient.cs" />
+    <Compile Include="Net\ILaikaServer.cs" />
     <Compile Include="Net\Session.cs" />
     <Compile Include="Serialize\MessagePack\MessagePackUtility.cs" />
     <Compile Include="SimpleImage\SimpleBitmap.cs" />
@@ -132,7 +136,7 @@
     <Compile Include="Log\TimeLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\AsyncInfo.cs" />
-    <Compile Include="Web\AsyncResponseEventArgs.cs" />
+    <Compile Include="EventArgs\AsyncResponseEventArgs.cs" />
     <Compile Include="Web\ContentType.cs" />
     <Compile Include="Web\LaikaWeb.cs" />
   </ItemGroup>

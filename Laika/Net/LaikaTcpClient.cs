@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
@@ -12,7 +8,7 @@ using Laika.Net.Body;
 
 namespace Laika.Net
 {
-    public class LaikaTcpClient<messageT, headerT, bodyT> : IDisposable
+    public class LaikaTcpClient<messageT, headerT, bodyT> : ILaikaClient
         where messageT : class, IMessage, new()
         where headerT : class, IHeader, new()
         where bodyT : class, IBody, new()
@@ -22,13 +18,13 @@ namespace Laika.Net
             InitializeEndPoint(host, port);
         }
 
-        public void Run()
+        public void BlockingStart()
         {
-            Poll();
+            NonBlockingStart();
             _clientWait.WaitOne();
         }
 
-        public void Poll()
+        public void NonBlockingStart()
         {
             InitializeClient();
         }
@@ -147,12 +143,7 @@ namespace Laika.Net
         private Receiver<messageT, headerT, bodyT> _receiver;
 
         public event DisconnectedSocketHandle DisconnectedSessionEvent;
-        public delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
-
         public event SocketExceptionHandle OccuredException;
-        public delegate void SocketExceptionHandle(object sender, ExceptionFromSessionEventArgs e);
-
         public event ReceiveHandle ReceivedMessage;
-        public delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
     }
 }

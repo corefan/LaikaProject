@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
@@ -18,7 +15,7 @@ namespace Laika.Net
     /// <typeparam name="messageT">IMessage 인터페이스를 갖는 Type</typeparam>
     /// <typeparam name="headerT">IHeader 인터페이스를 갖는 Type</typeparam>
     /// <typeparam name="bodyT">IBody 인터페이스를 갖는 Type</typeparam>
-    public class LaikaTcpServer<messageT, headerT, bodyT> : IDisposable
+    public class LaikaTcpServer<messageT, headerT, bodyT> : ILaikaServer
         where messageT : class, IMessage, new()
         where headerT : class, IHeader, new()
         where bodyT : class, IBody, new()
@@ -59,16 +56,16 @@ namespace Laika.Net
         /// <summary>
         /// 서버 준비. Nonblocking.
         /// </summary>
-        public void Poll()
+        public void NonblockingStart()
         {
             InitializeServer();
         }
         /// <summary>
         /// 서버 준비. Blocking.
         /// </summary>
-        public void Run()
+        public void BlockingStart()
         {
-            Poll();
+            NonblockingStart();
             _serverWait.WaitOne();
         }
         /// <summary>
@@ -83,6 +80,12 @@ namespace Laika.Net
         {
             _sender.SendAsync(session, message);
         }
+
+        public void SendMessage(IEnumerable<Session> sessionList, IMessage message)
+        {
+            _sender.SendAsync(sessionList, message);
+        }
+
         private void InitializeServer()
         {
             _listenerSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -103,7 +106,7 @@ namespace Laika.Net
             _receiver.DisconnectedSession += DisconnectedSession;
         }
 
-        void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
+        private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
         {
             if (e.SessionHandle.Handle != null)
             {
@@ -187,12 +190,7 @@ namespace Laika.Net
         private Sender<messageT, headerT, bodyT> _sender;
 
         public event ReceiveHandle ReceivedMessageFromSession;
-        public delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
-
         public event ErrorHandle OccuredError;
-        public delegate void ErrorHandle(object sender, ExceptionEventArgs e);
-
         public event ConnectHandle ConnectedSessionEvent;
-        public delegate void ConnectHandle(object sender, ConnectedSessionEventArgs e);
     }
 }

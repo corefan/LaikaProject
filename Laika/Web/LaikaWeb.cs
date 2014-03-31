@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.IO;
@@ -216,6 +215,5 @@ namespace Laika.Web
         /// 비동기 처리 시 response data 를 받을 때 발생하는 event
         /// </summary>
         public event ResponseEventHandler RequestResult;
-        public delegate void ResponseEventHandler(object sender, AsyncResponseEventArgs e);
     }
 }

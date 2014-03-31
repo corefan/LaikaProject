@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Laika.Event
@@ -69,7 +66,7 @@ namespace Laika.Event
         private void EndTask()
         {
             if (EndEvent != null)
-                EndEvent(_taskName);
+                EndEvent(this, new TaskServiceEndEventArgs(_taskName));
 
             Dispose();
         }
@@ -80,7 +77,6 @@ namespace Laika.Event
         private Timer _timer;
         private int _runCount;
 
-        public delegate void EndEventHandler(string name);
         public event EndEventHandler EndEvent;
         private bool _disposed = false;
     }
