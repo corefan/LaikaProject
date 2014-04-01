@@ -127,6 +127,10 @@
     <Compile Include="Serialize\XML\XmlSerializeUtility.cs" />
     <Compile Include="SimpleImage\SimpleImageBase.cs" />
     <Compile Include="SimpleImage\SimpleImage.cs" />
+    <Compile Include="UIDGen\Snowflake\DisposableAction.cs" />
+    <Compile Include="UIDGen\Snowflake\IdWorker.cs" />
+    <Compile Include="UIDGen\Snowflake\InvalidSystemClock.cs" />
+    <Compile Include="UIDGen\Snowflake\TimeExtensions.cs" />
     <Compile Include="ThreadPool\AppDomainThreadPoolManager.cs" />
     <Compile Include="Log\FileLog.cs" />
     <Compile Include="Log\FileLogFactory.cs" />
@@ -137,6 +141,7 @@
     <Compile Include="Log\SizeLog.cs" />
     <Compile Include="Log\TimeLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UIDGen\UniqueIDGenerator.cs" />
     <Compile Include="Web\AsyncInfo.cs" />
     <Compile Include="EventArgs\AsyncResponseEventArgs.cs" />
     <Compile Include="Web\ContentType.cs" />

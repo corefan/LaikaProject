@@ -12,13 +12,8 @@ namespace Laika.Net
         where bodyT : class, IBody, new()
     {
         internal event ReceiveHandle ReceivedMessage;
-        internal delegate void ReceiveHandle(object sender, ReceivedMessageEventArgs e);
-
         internal event ExceptionSessionHandle OccuredExceptionFromSession;
-        internal delegate void ExceptionSessionHandle(object sender, ExceptionFromSessionEventArgs e);
-
         internal event DisconnectedSocketHandle DisconnectedSession;
-        internal delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
 
         internal void BeginReceive(Session session)
         {

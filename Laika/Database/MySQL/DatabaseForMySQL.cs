@@ -63,7 +63,6 @@ namespace Laika.Database.MySql
             MySqlConnection conn = new MySqlConnection(_connectionString);
             conn.Open();
             conn.Dispose();
-            MySqlConnection.ClearAllPools();
         }
     }
 }

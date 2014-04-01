@@ -8,8 +8,7 @@ namespace Laika.Database
     /// 데이터베이스 샤딩 인터페이스
     /// </summary>
     /// <typeparam name="KeyType">샤딩 키 타입</typeparam>
-    /// <typeparam name="DBKeyType">DB 키 타입</typeparam>
-    public interface IDatabaseSharding<KeyType, DBKeyType> : IDisposable
+    public interface IDatabaseSharding<KeyType> : IDisposable
     {
         /// <summary>
         /// 샤딩 키로 데이터베이스를 찾는 메소드
@@ -28,7 +27,7 @@ namespace Laika.Database
         /// </summary>
         /// <param name="dbId">DB Key</param>
         /// <param name="db">데이터페이스 인스턴스</param>
-        void AddDatabase(DBKeyType dbId, IDatabase db);
+        void AddDatabase(KeyType dbId, IDatabase db);
         /// <summary>
         /// DB 리스트 메소드
         /// </summary>

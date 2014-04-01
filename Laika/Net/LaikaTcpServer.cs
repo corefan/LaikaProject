@@ -86,6 +86,11 @@ namespace Laika.Net
             _sender.SendAsync(sessionList, message);
         }
 
+        public void ReleaseBlocking()
+        {
+            _serverWait.Set();
+        }
+
         private void InitializeServer()
         {
             _listenerSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -108,22 +113,26 @@ namespace Laika.Net
 
         private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
         {
+            if (Disconnect != null)
+            {
+                Disconnect(this, e);
+            }
+
             if (e.SessionHandle.Handle != null)
             {
-                e.SessionHandle.Handle.Close();
-                e.SessionHandle.Handle.Dispose();
+                e.SessionHandle.Dispose();
             }
         }
 
         private void OccuredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
+            if (OccuredError != null)
+                OccuredError(this, new ExceptionEventArgs(e.SessionHandle, e.Exception));
+
             if (e.SessionHandle.Handle != null)
             {
-                e.SessionHandle.Handle.Close();
-                e.SessionHandle.Handle.Dispose();
+                e.SessionHandle.Dispose();
             }
-
-            this.OccuredError(this, new ExceptionEventArgs(e.Exception));
         }
 
         private void ReceivedMessage(object sender, ReceivedMessageEventArgs e)
@@ -175,7 +184,7 @@ namespace Laika.Net
         {
             if (_listenerSocket != null)
             {
-                _listenerSocket.Shutdown(SocketShutdown.Both);
+                _listenerSocket.Close();
                 _listenerSocket.Dispose();
                 _listenerSocket = null;
             }
@@ -192,5 +201,6 @@ namespace Laika.Net
         public event ReceiveHandle ReceivedMessageFromSession;
         public event ErrorHandle OccuredError;
         public event ConnectHandle ConnectedSessionEvent;
+        public event DisconnectedSocketHandle Disconnect;
     }
 }

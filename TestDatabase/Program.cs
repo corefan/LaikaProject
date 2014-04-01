@@ -11,7 +11,7 @@ using MySql.Data.MySqlClient;
 using System.Data.SqlClient;
 namespace TestDatabase
 {
-    internal class ShardDB : DatabaseShardingBase<string, string>
+    internal class ShardDB : DatabaseShardingBase<string>
     {
         public override IDatabase FindDB(string key)
         {
@@ -34,7 +34,7 @@ namespace TestDatabase
 
         private static void TestSharding(IDatabase db)
         {
-            IDatabaseSharding<string, string> ShardingDB = new ShardDB();
+            IDatabaseSharding<string> ShardingDB = new ShardDB();
             ShardingDB.AddDatabase("mysqlDB1", db);
             IDatabase findDB = ShardingDB.FindDB("mysqlDB1");
             ShardingDB.Dispose();

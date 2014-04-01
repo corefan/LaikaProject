@@ -15,6 +15,7 @@ namespace Laika.Net
         internal void NewAccept()
         {
             Session session = new Session();
+            session.ServerSequenceId = Laika.UIDGen.UniqueIDGenerator.GetID();
             SocketAsyncEventArgs acceptArgs = new SocketAsyncEventArgs();
             acceptArgs.UserToken = session;
             acceptArgs.Completed += AcceptCompleted;
@@ -25,7 +26,7 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 if (OccuredExceptionFromAccept != null)
-                    OccuredExceptionFromAccept(this, new ExceptionEventArgs(ex));
+                    OccuredExceptionFromAccept(this, new ExceptionEventArgs(session, ex));
             }
         }
 

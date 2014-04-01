@@ -57,8 +57,7 @@ namespace Laika.Net
         {
             if (e.SessionHandle.Handle != null)
             {
-                e.SessionHandle.Handle.Close();
-                e.SessionHandle.Handle.Dispose();
+                e.SessionHandle.Dispose();
             }
             if (OccuredException != null)
                 OccuredException(this, e);
@@ -121,8 +120,7 @@ namespace Laika.Net
         {
             if (_session != null && _session.Handle != null)
             {
-                _session.Handle.Shutdown(SocketShutdown.Both);
-                _session.Handle.Dispose();
+                _session.Dispose();
             }
         }
 

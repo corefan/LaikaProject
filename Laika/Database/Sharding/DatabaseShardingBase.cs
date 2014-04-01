@@ -9,16 +9,15 @@ namespace Laika.Database.Sharding
     /// 데이터베이스 샤딩 기본 클래스.
     /// 사용하기 위해서는 DatabaseShardingBase 클래스를 상속 받아서 합니다.
     /// </summary>
-    /// <typeparam name="ShardKeyType">샤딩 키 타입</typeparam>
-    /// <typeparam name="DBKeyType">DB 키 타입</typeparam>
-    public abstract class DatabaseShardingBase<ShardKeyType, DBKeyType> : IDatabaseSharding<ShardKeyType, DBKeyType>
+    /// <typeparam name="KeyType">샤딩 키 타입</typeparam>
+    public abstract class DatabaseShardingBase<KeyType> : IDatabaseSharding<KeyType>
     {
         /// <summary>
         /// 샤딩 키로 DB 검색
         /// </summary>
         /// <param name="key">샤딩 키</param>
         /// <returns>데이터베이스</returns>
-        public abstract IDatabase FindDB(ShardKeyType key);
+        public abstract IDatabase FindDB(KeyType key);
         /// <summary>
         /// 모든 DB에 비동기 작업 수행
         /// </summary>
@@ -40,7 +39,7 @@ namespace Laika.Database.Sharding
         /// </summary>
         /// <param name="dbId">DB key</param>
         /// <param name="db">데이터베이스</param>
-        public void AddDatabase(DBKeyType dbId, IDatabase db)
+        public void AddDatabase(KeyType dbId, IDatabase db)
         {
             if (AllDataBase.ContainsKey(dbId) == true)
                 throw new ArgumentException("Already contains key. duplicated dbId");
@@ -86,8 +85,7 @@ namespace Laika.Database.Sharding
             Dispose(false);
         }
 
-        protected ShardKeyType _shardKey = default(ShardKeyType);
-        protected Dictionary<DBKeyType, IDatabase> AllDataBase = new Dictionary<DBKeyType, IDatabase>();
+        protected Dictionary<KeyType, IDatabase> AllDataBase = new Dictionary<KeyType, IDatabase>();
         private bool _disposed = false;
     }
 }
