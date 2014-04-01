@@ -68,6 +68,7 @@
     <Compile Include="Database\DbJobBase.cs" />
     <Compile Include="Database\IDatabase.cs" />
     <Compile Include="Database\IDatabaseSharding.cs" />
+    <Compile Include="Database\MySqlUtility.cs" />
     <Compile Include="Database\MySql\DatabaseForMySql.cs" />
     <Compile Include="Database\MySql\MySqlDbJob.cs" />
     <Compile Include="Database\MySql\MySqlTransactionContext.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="EventArgs\ExceptionFromSessionEventArgs.cs" />
     <Compile Include="EventArgs\ReceivedMessageEventArgs.cs" />
     <Compile Include="EventHandler\LaikaEventHandler.cs" />
+    <Compile Include="Network\NetworkUtility.cs" />
     <Compile Include="Net\ILaikaClient.cs" />
     <Compile Include="Net\ILaikaServer.cs" />
     <Compile Include="Net\Session.cs" />
