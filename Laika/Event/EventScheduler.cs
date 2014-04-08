@@ -52,7 +52,8 @@ namespace Laika.Event
         {
             TaskService ts = null;
             bool result = _taskTable.TryRemove(eventName, out ts);
-            ts.Dispose();
+            if (result == true)
+                ts.Dispose();
             return result;
         }
         /// <summary>

@@ -92,6 +92,8 @@ namespace Laika.Net
         private void ConnectedSession(object sender, ConnectedSessionEventArgs e)
         {
             _connectWait.Set();
+            if (ConnectedEvent != null)
+                ConnectedEvent(this, e);
         }
 
         ~LaikaTcpClient()
@@ -131,7 +133,6 @@ namespace Laika.Net
         }
 
         private Session _session;
-        //private Socket _socket;
         private IPEndPoint _remoteEndPoint;
         private bool _disposed = false;
         private ManualResetEvent _clientWait = new ManualResetEvent(false);
@@ -143,5 +144,6 @@ namespace Laika.Net
         public event DisconnectedSocketHandle DisconnectedSessionEvent;
         public event SocketExceptionHandle OccuredException;
         public event ReceiveHandle ReceivedMessage;
+        public event ConnectHandle ConnectedEvent;
     }
 }
