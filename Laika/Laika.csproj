@@ -81,6 +81,7 @@
     <Compile Include="Data\Json\JsonToObject.cs" />
     <Compile Include="Data\Json\MiniJson.cs" />
     <Compile Include="Data\Xml\XmlUtility.cs" />
+    <Compile Include="EventArgs\SendMessageEventArgs.cs" />
     <Compile Include="EventArgs\TaskServiceEndEventArgs.cs" />
     <Compile Include="Event\Event.cs" />
     <Compile Include="Event\EventScheduler.cs" />

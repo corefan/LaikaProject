@@ -53,9 +53,7 @@ namespace Laika.Net
         private Socket _acceptingSocket;
 
         internal event ConnectedHandle ConnectedSession;
-        internal delegate void ConnectedHandle(object sender, AcceptEventArgs e);
-
-        internal event ExceptionSocketHandle OccuredExceptionFromAccept;
-        internal delegate void ExceptionSocketHandle(object sender, ExceptionEventArgs e);
+        internal event ErrorHandle OccuredExceptionFromAccept;
+        
     }
 }

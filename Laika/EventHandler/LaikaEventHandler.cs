@@ -7,6 +7,8 @@ namespace Laika.Net
     public delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
     public delegate void SocketExceptionHandle(object sender, ExceptionFromSessionEventArgs e);
     public delegate void ExceptionSessionHandle(object sender, ExceptionFromSessionEventArgs e);
+    public delegate void SendCompletedHandle(object sender, SendMessageEventArgs e);
+    public delegate void ConnectedHandle(object sender, AcceptEventArgs e);             // acceptor
 }
 
 namespace Laika.Web

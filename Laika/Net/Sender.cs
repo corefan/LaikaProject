@@ -57,6 +57,8 @@ namespace Laika.Net
                 }
                 else if (context.BytesTransferred == context.SendData.Length)
                 {
+                    if (EventCompletedSendData != null)
+                        EventCompletedSendData(this, new SendMessageEventArgs(session));
                     CleanArgument(e, context);
                 }
                 else
@@ -87,11 +89,9 @@ namespace Laika.Net
             }
         }
 
-        internal event ExceptionSocketHandle OccuredExceptionFromSession;
-        internal delegate void ExceptionSocketHandle(object sender, ExceptionFromSessionEventArgs e);
-
+        internal event ExceptionSessionHandle OccuredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
-        internal delegate void DisconnectedSocketHandle(object sender, DisconnectSocketEventArgs e);
+        internal event SendCompletedHandle EventCompletedSendData;
 
         internal class SendContext
         {

@@ -36,6 +36,5 @@ namespace Laika.Net
         }
 
         internal event ConnectHandle ConnectedSession;
-        internal delegate void ConnectHandle(object sender, ConnectedSessionEventArgs e);
     }
 }

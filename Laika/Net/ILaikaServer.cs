@@ -14,5 +14,6 @@ namespace Laika.Net
         event ErrorHandle OccuredError;
         event ConnectHandle ConnectedSessionEvent;
         event DisconnectedSocketHandle Disconnect;
+        event SendCompletedHandle EventCompletedSendData;
     }
 }

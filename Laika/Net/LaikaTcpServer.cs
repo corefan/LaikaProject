@@ -145,6 +145,13 @@ namespace Laika.Net
             _sender = new Sender<messageT, headerT, bodyT>();
             _sender.OccuredExceptionFromSession += OccuredExceptionFromSession;
             _sender.DisconnectedSession += DisconnectedSession;
+            _sender.EventCompletedSendData += EventCompletedSendDataProc;
+        }
+
+        private void EventCompletedSendDataProc(object sender, SendMessageEventArgs e)
+        {
+            if (EventCompletedSendData != null)
+                EventCompletedSendData(this, e);
         }
 
         private void InitializeAcceptor()
@@ -202,5 +209,6 @@ namespace Laika.Net
         public event ErrorHandle OccuredError;
         public event ConnectHandle ConnectedSessionEvent;
         public event DisconnectedSocketHandle Disconnect;
+        public event SendCompletedHandle EventCompletedSendData;
     }
 }
