@@ -77,7 +77,7 @@
     <Compile Include="Database\SqlServer\SqlServerDbJob.cs" />
     <Compile Include="Database\SqlServer\SqlServerTransactionContext.cs" />
     <Compile Include="Database\TransactionContextBase.cs" />
-    <Compile Include="Data\Ini\ExtendIni.cs" />
+    <Compile Include="Data\Ini\CFIni.cs" />
     <Compile Include="Data\Ini\Ini.cs" />
     <Compile Include="Data\Json\JsonToObject.cs" />
     <Compile Include="Data\Json\MiniJson.cs" />
