@@ -12,7 +12,7 @@ namespace Laika.Net
         where bodyT : class, IBody, new()
     {
         internal event ReceiveHandle ReceivedMessage;
-        internal event ExceptionSessionHandle OccuredExceptionFromSession;
+        internal event ExceptionSessionHandle OccurredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
 
         internal void BeginReceive(Session session)
@@ -37,8 +37,8 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 CleanArgument(receiveEventArg);
-                if (OccuredExceptionFromSession != null)
-                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
+                if (OccurredExceptionFromSession != null)
+                    OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
@@ -92,8 +92,8 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 CleanArgument(e);
-                if (OccuredExceptionFromSession != null)
-                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
+                if (OccurredExceptionFromSession != null)
+                    OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
@@ -141,8 +141,8 @@ namespace Laika.Net
             catch (Exception ex)
             {
                 CleanArgument(e);
-                if (OccuredExceptionFromSession != null)
-                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
+                if (OccurredExceptionFromSession != null)
+                    OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 

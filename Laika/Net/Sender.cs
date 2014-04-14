@@ -69,8 +69,8 @@ namespace Laika.Net
             }
             catch (Exception ex)
             {
-                if (OccuredExceptionFromSession != null)
-                    OccuredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
+                if (OccurredExceptionFromSession != null)
+                    OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
@@ -89,7 +89,7 @@ namespace Laika.Net
             }
         }
 
-        internal event ExceptionSessionHandle OccuredExceptionFromSession;
+        internal event ExceptionSessionHandle OccurredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
         internal event SendCompletedHandle EventCompletedSendData;
 

@@ -107,7 +107,7 @@ namespace Laika.Net
         {
             _receiver = new Receiver<messageT, headerT, bodyT>();
             _receiver.ReceivedMessage += ReceivedMessage;
-            _receiver.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _receiver.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _receiver.DisconnectedSession += DisconnectedSession;
         }
 
@@ -124,10 +124,10 @@ namespace Laika.Net
             }
         }
 
-        private void OccuredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
+        private void OccurredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
-            if (OccuredError != null)
-                OccuredError(this, new ExceptionEventArgs(e.SessionHandle, e.Exception));
+            if (OccurredError != null)
+                OccurredError(this, new ExceptionEventArgs(e.SessionHandle, e.Exception));
 
             if (e.SessionHandle.Handle != null)
             {
@@ -143,7 +143,7 @@ namespace Laika.Net
         private void InitializeSender()
         {
             _sender = new Sender<messageT, headerT, bodyT>();
-            _sender.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _sender.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _sender.DisconnectedSession += DisconnectedSession;
             _sender.EventCompletedSendData += EventCompletedSendDataProc;
         }
@@ -158,7 +158,7 @@ namespace Laika.Net
         {
             _acceptor = new Acceptor(_listenerSocket);
             _acceptor.ConnectedSession += ConnectedSession;
-            _acceptor.OccuredExceptionFromAccept += OccuredExceptionFromAccept;
+            _acceptor.OccurredExceptionFromAccept += OccurredExceptionFromAccept;
             _acceptor.NewAccept();
         }
 
@@ -170,10 +170,10 @@ namespace Laika.Net
             _receiver.BeginReceive(e.SessionHandle);
         }
 
-        private void OccuredExceptionFromAccept(object sender, ExceptionEventArgs e)
+        private void OccurredExceptionFromAccept(object sender, ExceptionEventArgs e)
         {
-            if (OccuredError != null)
-                OccuredError(this, e);
+            if (OccurredError != null)
+                OccurredError(this, e);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -206,7 +206,7 @@ namespace Laika.Net
         private Sender<messageT, headerT, bodyT> _sender;
 
         public event ReceiveHandle ReceivedMessageFromSession;
-        public event ErrorHandle OccuredError;
+        public event ErrorHandle OccurredError;
         public event ConnectHandle ConnectedSessionEvent;
         public event DisconnectedSocketHandle Disconnect;
         public event SendCompletedHandle EventCompletedSendData;

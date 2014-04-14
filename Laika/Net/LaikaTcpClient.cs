@@ -48,19 +48,19 @@ namespace Laika.Net
         {
             _receiver = new Receiver<messageT, headerT, bodyT>();
             _receiver.DisconnectedSession += DisconnectedSession;
-            _receiver.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _receiver.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _receiver.ReceivedMessage += ReceivedMessageFromServer;
             _receiver.BeginReceive(_session);
         }
 
-        private void OccuredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
+        private void OccurredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
             if (e.SessionHandle.Handle != null)
             {
                 e.SessionHandle.Dispose();
             }
-            if (OccuredException != null)
-                OccuredException(this, e);
+            if (OccurredException != null)
+                OccurredException(this, e);
         }
 
         private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
@@ -79,7 +79,7 @@ namespace Laika.Net
         {
             _sender = new Sender<messageT, headerT, bodyT>();
             _sender.DisconnectedSession += DisconnectedSession;
-            _sender.OccuredExceptionFromSession += OccuredExceptionFromSession;
+            _sender.OccurredExceptionFromSession += OccurredExceptionFromSession;
         }
 
         private void InitializeConnector()
@@ -142,7 +142,7 @@ namespace Laika.Net
         private Receiver<messageT, headerT, bodyT> _receiver;
 
         public event DisconnectedSocketHandle DisconnectedSessionEvent;
-        public event SocketExceptionHandle OccuredException;
+        public event SocketExceptionHandle OccurredException;
         public event ReceiveHandle ReceivedMessage;
         public event ConnectHandle ConnectedEvent;
     }

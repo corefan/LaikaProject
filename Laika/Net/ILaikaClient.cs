@@ -10,7 +10,7 @@ namespace Laika.Net
         void SendAsync(IMessage message);
 
         event DisconnectedSocketHandle DisconnectedSessionEvent;
-        event SocketExceptionHandle OccuredException;
+        event SocketExceptionHandle OccurredException;
         event ReceiveHandle ReceivedMessage;
     }
 }

@@ -59,7 +59,7 @@ namespace TestNet
         {
             client = new LaikaTcpClient<Message, Header, Body>("127.0.0.1", 10000);
             client.DisconnectedSessionEvent += client_DisconnectedSessionEvent;
-            client.OccuredException += client_OccuredException;
+            client.OccurredException += client_OccurredException;
             client.ReceivedMessage += client_ReceivedMessage;
             client.NonBlockingStart();
             Message m = new Message();
@@ -78,9 +78,9 @@ namespace TestNet
             Console.WriteLine(result);
         }
 
-        static void client_OccuredException(object sender, ExceptionFromSessionEventArgs e)
+        static void client_OccurredException(object sender, ExceptionFromSessionEventArgs e)
         {
-            Console.WriteLine("Client Occured Exception {0}", e.Exception.ToString());
+            Console.WriteLine("Client Occurred Exception {0}", e.Exception.ToString());
         }
 
         static void client_DisconnectedSessionEvent(object sender, DisconnectSocketEventArgs e)
@@ -92,7 +92,7 @@ namespace TestNet
         {
             server = new LaikaTcpServer<Message, Header, Body>(10000);
             server.ConnectedSessionEvent += server_ConnectedSocket;
-            server.OccuredError += server_OccuredError;
+            server.OccurredError += server_OccurredError;
             server.ReceivedMessageFromSession += server_ReceivedMessageFromSession;
             server.NonblockingStart();
         }
@@ -111,9 +111,9 @@ namespace TestNet
             Console.WriteLine("Connected : {0}", e.SessionHandle.Handle.Handle.ToInt32());
         }
         
-        static void server_OccuredError(object sender, ExceptionEventArgs e)
+        static void server_OccurredError(object sender, ExceptionEventArgs e)
         {
-            Console.WriteLine("Ocurred Error : {0}", e.Exception.ToString());
+            Console.WriteLine("Occurred Error : {0}", e.Exception.ToString());
         }
     }
 }

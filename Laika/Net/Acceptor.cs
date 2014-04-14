@@ -25,8 +25,8 @@ namespace Laika.Net
             }
             catch (Exception ex)
             {
-                if (OccuredExceptionFromAccept != null)
-                    OccuredExceptionFromAccept(this, new ExceptionEventArgs(session, ex));
+                if (OccurredExceptionFromAccept != null)
+                    OccurredExceptionFromAccept(this, new ExceptionEventArgs(session, ex));
             }
         }
 
@@ -53,7 +53,7 @@ namespace Laika.Net
         private Socket _acceptingSocket;
 
         internal event ConnectedHandle ConnectedSession;
-        internal event ErrorHandle OccuredExceptionFromAccept;
+        internal event ErrorHandle OccurredExceptionFromAccept;
         
     }
 }

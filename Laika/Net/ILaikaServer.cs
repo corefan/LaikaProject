@@ -11,7 +11,7 @@ namespace Laika.Net
         void SendMessage(Session session, IMessage message);
         void SendMessage(IEnumerable<Session> sessionList, IMessage message);
         event ReceiveHandle ReceivedMessageFromSession;
-        event ErrorHandle OccuredError;
+        event ErrorHandle OccurredError;
         event ConnectHandle ConnectedSessionEvent;
         event DisconnectedSocketHandle Disconnect;
         event SendCompletedHandle EventCompletedSendData;
