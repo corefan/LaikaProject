@@ -16,9 +16,17 @@ namespace TestData
     {
         static void Main(string[] args)
         {
-            TestJson();
-            TestIni();
-            TestXml();
+            //TestJson();
+            //TestIni();
+            //TestXml();
+            TestExtendIni();
+        }
+
+        private static void TestExtendIni()
+        {
+            string dirInfo = Directory.GetCurrentDirectory();
+            CFIni ini = new CFIni(Path.Combine(dirInfo, "test.ini"));
+            Console.WriteLine(ini.GetIniValue("your_section", "hi"));
         }
 
         private static void TestXml()
