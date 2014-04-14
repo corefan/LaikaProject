@@ -30,6 +30,7 @@ namespace Laika.Net
 
         private void Clear()
         {
+            Handle.Disconnect(false);
             Handle.Close();
             Handle.Dispose();
         }
