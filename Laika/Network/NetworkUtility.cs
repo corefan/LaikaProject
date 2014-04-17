@@ -1,18 +1,37 @@
 ﻿using System;
-using System.Net;
+using System.Text;
 
 namespace Laika.Network
 {
     public class NetworkUtility
     {
-        public static int IPToInteger(string intAddress)
+        public static uint IPToDecimal(string address)
         {
-            return BitConverter.ToInt32(IPAddress.Parse(intAddress).GetAddressBytes(), 0);
+            string[] val = address.Split('.');
+            if (val.Length != 4)
+                throw new Exception("Invalid IPv4 length.");
+
+            byte[] bytesData = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                bytesData[3 - i] = byte.Parse(val[i]);
+            }
+
+            return BitConverter.ToUInt32(bytesData, 0);
         }
 
-        public static string IntegerToIP(int intAddress)
+        public static string DecimalToIP(uint decimalAddress)
         {
-            return new IPAddress(BitConverter.GetBytes(intAddress)).ToString();
+            string[] val = new string[4];
+
+            byte[] bytesData = BitConverter.GetBytes(decimalAddress);
+
+            for (int i = 0; i < 4; i++)
+            {
+                val[3 - i] = bytesData[i].ToString();
+            }
+
+            return string.Join(".", val);
         }
     }
 }
