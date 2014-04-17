@@ -50,7 +50,7 @@ namespace Laika.Net
             _receiver.DisconnectedSession += DisconnectedSession;
             _receiver.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _receiver.ReceivedMessage += ReceivedMessageFromServer;
-            _receiver.BeginReceive(_session);
+            _receiver.ReceiveAsync(_session);
         }
 
         private void OccurredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)

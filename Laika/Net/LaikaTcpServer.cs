@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Laika.Net.Message;
 using Laika.Net.Header;
 using Laika.Net.Body;
@@ -76,12 +77,17 @@ namespace Laika.Net
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        public void SendMessage(Session session, IMessage message)
+        public Task SendMessage(Session session, IMessage message)
+        {
+            return _sender.Send(session, message);
+        }
+            
+        public void SendMessageAsync(Session session, IMessage message)
         {
             _sender.SendAsync(session, message);
         }
 
-        public void SendMessage(IEnumerable<Session> sessionList, IMessage message)
+        public void SendMessageAsync(IEnumerable<Session> sessionList, IMessage message)
         {
             _sender.SendAsync(sessionList, message);
         }
@@ -167,7 +173,7 @@ namespace Laika.Net
             if (ConnectedSessionEvent != null)
                 ConnectedSessionEvent(this, new ConnectedSessionEventArgs(e.SessionHandle));
 
-            _receiver.BeginReceive(e.SessionHandle);
+            _receiver.ReceiveAsync(e.SessionHandle);
         }
 
         private void OccurredExceptionFromAccept(object sender, ExceptionEventArgs e)

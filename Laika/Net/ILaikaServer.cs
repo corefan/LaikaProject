@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Laika.Net.Message;
 
 namespace Laika.Net
@@ -8,8 +9,9 @@ namespace Laika.Net
     {
         void NonblockingStart();
         void BlockingStart();
-        void SendMessage(Session session, IMessage message);
-        void SendMessage(IEnumerable<Session> sessionList, IMessage message);
+        Task SendMessage(Session session, IMessage message);
+        void SendMessageAsync(Session session, IMessage message);
+        void SendMessageAsync(IEnumerable<Session> sessionList, IMessage message);
         event ReceiveHandle ReceivedMessageFromSession;
         event ErrorHandle OccurredError;
         event ConnectHandle ConnectedSessionEvent;

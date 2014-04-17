@@ -14,7 +14,7 @@ namespace Laika.Net
         where headerT : class, IHeader, new()
         where bodyT : class, IBody, new()
     {
-        private void SendMessageToSocket(Session session, byte[] sendData)
+        private void SendMessageToSocketAsync(Session session, byte[] sendData)
         {
             SendContext context = new SendContext();
             context.SendData = sendData;
@@ -106,7 +106,7 @@ namespace Laika.Net
                 return;
             if (CheckMessage(message) == false)
                 return;
-            SendMessageToSocket(session, GetData(message));
+            SendMessageToSocketAsync(session, GetData(message));
         }
 
         private bool CheckMessage(IMessage message)
@@ -154,7 +154,32 @@ namespace Laika.Net
             
             Parallel.ForEach(sessionList, session => 
             {
-                SendMessageToSocket(session, sendData);
+                SendMessageToSocketAsync(session, sendData);
+            });
+        }
+
+        internal Task Send(Session session, IMessage message)
+        {
+            if (CheckSession(session) == false)
+                return null;
+            if (CheckMessage(message) == false)
+                return null;
+
+            byte[] sendData = GetData(message);
+            return SendMessageToSocket(session, sendData, 0, sendData.Length);
+        }
+
+        private Task SendMessageToSocket(Session session, byte[] sendData, int offset, int size)
+        {
+            return Task.Factory.StartNew(() => 
+            {
+                int bytesTransfferred = 0;
+                while (true)
+                {
+                    bytesTransfferred += session.Handle.Send(sendData, bytesTransfferred, sendData.Length - bytesTransfferred, SocketFlags.None);
+                    if (bytesTransfferred >= sendData.Length)
+                        break;
+                }
             });
         }
     }

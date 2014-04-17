@@ -15,7 +15,7 @@ namespace Laika.Net
         internal event ExceptionSessionHandle OccurredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
 
-        internal void BeginReceive(Session session)
+        internal void ReceiveAsync(Session session)
         {
             if (session == null || session.Handle == null)
                 return;
@@ -130,7 +130,7 @@ namespace Laika.Net
                     if (ReceivedMessage != null)
                         ReceivedMessage(this, new ReceivedMessageEventArgs(message));
 
-                    BeginReceive(session);
+                    ReceiveAsync(session);
                 }
                 else
                 {
