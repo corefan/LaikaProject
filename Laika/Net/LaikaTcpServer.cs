@@ -197,7 +197,6 @@ namespace Laika.Net
         {
             if (_listenerSocket != null)
             {
-                _listenerSocket.Disconnect(true);
                 _listenerSocket.Close();
                 _listenerSocket.Dispose();
                 _listenerSocket = null;

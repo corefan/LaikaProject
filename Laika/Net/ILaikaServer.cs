@@ -12,6 +12,7 @@ namespace Laika.Net
         Task SendMessage(Session session, IMessage message);
         void SendMessageAsync(Session session, IMessage message);
         void SendMessageAsync(IEnumerable<Session> sessionList, IMessage message);
+        void ReleaseBlocking();
         event ReceiveHandle ReceivedMessageFromSession;
         event ErrorHandle OccurredError;
         event ConnectHandle ConnectedSessionEvent;
