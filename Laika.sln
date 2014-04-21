@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLaikaWeb", "TestLaikaWe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUIDGen", "TestUIDGen\TestUIDGen.csproj", "{3BE449C7-4FB8-4921-A963-78000FDCBB78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCounter", "TestCounter\TestCounter.csproj", "{C684A0EF-A7C6-4DEE-A059-782F8CE2955E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,10 @@ Global
 		{3BE449C7-4FB8-4921-A963-78000FDCBB78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BE449C7-4FB8-4921-A963-78000FDCBB78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BE449C7-4FB8-4921-A963-78000FDCBB78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C684A0EF-A7C6-4DEE-A059-782F8CE2955E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C684A0EF-A7C6-4DEE-A059-782F8CE2955E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C684A0EF-A7C6-4DEE-A059-782F8CE2955E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C684A0EF-A7C6-4DEE-A059-782F8CE2955E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
