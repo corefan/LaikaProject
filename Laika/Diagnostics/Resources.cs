@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-namespace Laika.Diagnotics
+namespace Laika.Diagnostics
 {
     public static class MeasureResource
     {
