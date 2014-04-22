@@ -104,6 +104,7 @@
     <Compile Include="Net\ILaikaClient.cs" />
     <Compile Include="Net\ILaikaServer.cs" />
     <Compile Include="Net\Session.cs" />
+    <Compile Include="Pools\ObjectPooling.cs" />
     <Compile Include="Serialize\MessagePack\MessagePackUtility.cs" />
     <Compile Include="SimpleImage\SimpleBitmap.cs" />
     <Compile Include="MessageHandler\MessageHandlerAttribute.cs" />

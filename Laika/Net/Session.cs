@@ -7,6 +7,7 @@ namespace Laika.Net
         public Session() 
         {
             Handle = null;
+            ReceiveEventArgs = new SocketAsyncEventArgs();
         }
         ~Session()
         {
@@ -30,6 +31,7 @@ namespace Laika.Net
 
         private void Clear()
         {
+            ReceiveEventArgs.Dispose();
             Handle.Disconnect(false);
             Handle.Close();
             Handle.Dispose();
@@ -37,6 +39,7 @@ namespace Laika.Net
 
         public Socket Handle { get; internal set; }
         public long ServerSequenceId { get; internal set; }
+        internal SocketAsyncEventArgs ReceiveEventArgs { get; set; }
         private bool disposed = false;
     }
 }

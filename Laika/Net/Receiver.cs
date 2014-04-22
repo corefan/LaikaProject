@@ -20,23 +20,23 @@ namespace Laika.Net
             if (session == null || session.Handle == null)
                 return;
 
-            SocketAsyncEventArgs receiveEventArg = null;
+            //SocketAsyncEventArgs receiveEventArg = null;
             try
             {
-                receiveEventArg = new SocketAsyncEventArgs();
+                //receiveEventArg = new SocketAsyncEventArgs();
                 messageT message = new messageT();
                 message.Session = session;
                 message.Header = new headerT();
                 message.Header.HeaderRawData = new byte[message.Header.GetHeaderSize()];
-                receiveEventArg.UserToken = message;
-                receiveEventArg.SetBuffer(message.Header.HeaderRawData, 0, message.Header.HeaderRawData.Length);
-                receiveEventArg.Completed += ReceiveHeaderCompleted;
+                session.ReceiveEventArgs.UserToken = message;
+                session.ReceiveEventArgs.SetBuffer(message.Header.HeaderRawData, 0, message.Header.HeaderRawData.Length);
+                session.ReceiveEventArgs.Completed += ReceiveHeaderCompleted;
 
-                session.Handle.ReceiveAsync(receiveEventArg);
+                session.Handle.ReceiveAsync(session.ReceiveEventArgs);
             }
             catch (Exception ex)
             {
-                CleanArgument(receiveEventArg);
+                //CleanArgument(receiveEventArg);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
@@ -59,7 +59,7 @@ namespace Laika.Net
                     if (DisconnectedSession != null)
                         DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
-                    CleanArgument(e);
+                    //CleanArgument(e);
                     return;
                 }
                 else if (message.Header.BytesTransferred < message.Header.GetHeaderSize())
@@ -85,13 +85,13 @@ namespace Laika.Net
                 }
                 else
                 {
-                    CleanArgument(e);
+                    //CleanArgument(e);
                     throw new ArgumentException();
                 }
             }
             catch (Exception ex)
             {
-                CleanArgument(e);
+                //CleanArgument(e);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
@@ -114,7 +114,7 @@ namespace Laika.Net
                     if (DisconnectedSession != null)
                         DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
-                    CleanArgument(e);
+                    //CleanArgument(e);
                     return;
                 }
                 else if (message.Body.BytesTransferred < message.Header.ContentsSize)
@@ -125,34 +125,34 @@ namespace Laika.Net
                 }
                 else if (message.Body.BytesTransferred == message.Header.ContentsSize)
                 {
-                    CleanArgument(e);
-
+                    //CleanArgument(e);
+                    e.Completed -= ReceiveBodyCompleted;
                     if (ReceivedMessage != null)
                         ReceivedMessage(this, new ReceivedMessageEventArgs(message));
-
+                    
                     ReceiveAsync(session);
                 }
                 else
                 {
-                    CleanArgument(e);
+                    //CleanArgument(e);
                     throw new SocketException();
                 }
             }
             catch (Exception ex)
             {
-                CleanArgument(e);
+                //CleanArgument(e);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
 
-        private void CleanArgument(SocketAsyncEventArgs e)
-        {
-            if (e != null)
-            {
-                e.Dispose();
-                e = null;
-            }
-        }
+        //private void CleanArgument(SocketAsyncEventArgs e)
+        //{
+        //    if (e != null)
+        //    {
+        //        e.Dispose();
+        //        e = null;
+        //    }
+        //}
     }
 }
