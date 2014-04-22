@@ -33,10 +33,22 @@ namespace Laika.Serialize.ProtobufNet
         /// <returns>instance</returns>
         public static T Deserialize<T>(byte[] serializedData)
         {
-            if (serializedData == null)
+            return Deserailize<T>(serializedData, 0, serializedData.Length);
+        }
+        /// <summary>
+        /// deserialize
+        /// </summary>
+        /// <typeparam name="T">Deserialize Type</typeparam>
+        /// <param name="serializeData">serialized data</param>
+        /// <param name="index">start position of byte array</param>
+        /// <param name="length">length of byte array</param>
+        /// <returns></returns>
+        public static T Deserailize<T>(byte[] serializeData, int index, int length)
+        {
+            if (serializeData == null)
                 return default(T);
 
-            using (MemoryStream outputStream = new MemoryStream(serializedData))
+            using (MemoryStream outputStream = new MemoryStream(serializeData, index, length))
             {
                 return Serializer.Deserialize<T>(outputStream);
             }
