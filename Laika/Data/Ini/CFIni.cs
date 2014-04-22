@@ -20,9 +20,11 @@ namespace Laika.Data.Ini
 
         private void Loading()
         {
-            _reader = new StreamReader(_file);
-            string str = _reader.ReadLine();
-            Parsing(str);
+            using (_reader = new StreamReader(_file))
+            {
+                string str = _reader.ReadLine();
+                Parsing(str);
+            }
         }
 
         private void Parsing(string line)
