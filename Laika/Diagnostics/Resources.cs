@@ -14,7 +14,7 @@ namespace Laika.Diagnostics
             {
                 _machineCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
             }
-            
+
             return _machineCounter.NextValue();
         }
 
@@ -32,6 +32,11 @@ namespace Laika.Diagnostics
         {
             _currentProcess.Refresh();
             return _currentProcess.WorkingSet64;
+        }
+
+        public static int GetThreadCount()
+        {
+            return Process.GetCurrentProcess().Threads.Count;
         }
 
         private static Process _currentProcess = Process.GetCurrentProcess();
