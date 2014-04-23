@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Net;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Laika.Net.Message;
@@ -97,6 +99,23 @@ namespace Laika.Net
             _serverWait.Set();
         }
 
+        public void SessionCleanup(TimeSpan span)
+        {
+            IEnumerable<Session> sessions = _sessionDictionary.Where(x => 
+            {
+                if (x.Value.LastReceivedTime + span < DateTime.Now)
+                    return true;
+                return false;
+            }).Select(x=>x.Value);
+
+            foreach (var s in sessions)
+            {
+                Session session;
+                _sessionDictionary.TryRemove(s.ServerSequenceId, out session);
+                session.Dispose();
+            }
+        }
+
         private void InitializeServer()
         {
             _listenerSocket = new Socket(_endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -119,6 +138,9 @@ namespace Laika.Net
 
         private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
         {
+            Session session;
+            _sessionDictionary.TryRemove(e.SessionHandle.ServerSequenceId, out session);
+
             if (Disconnect != null)
             {
                 Disconnect(this, e);
@@ -132,6 +154,9 @@ namespace Laika.Net
 
         private void OccurredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
+            Session session;
+            _sessionDictionary.TryRemove(e.SessionHandle.ServerSequenceId, out session);
+
             if (OccurredError != null)
                 OccurredError(this, new ExceptionEventArgs(e.SessionHandle, e.Exception));
 
@@ -143,6 +168,8 @@ namespace Laika.Net
 
         private void ReceivedMessage(object sender, ReceivedMessageEventArgs e)
         {
+            e.Message.Session.LastReceivedTime = DateTime.Now;
+
             if (ReceivedMessageFromSession != null)
                 ReceivedMessageFromSession(this, e);
         }
@@ -170,6 +197,9 @@ namespace Laika.Net
 
         private void ConnectedSession(object sender, AcceptEventArgs e)
         {
+            e.SessionHandle.LastReceivedTime = DateTime.Now;
+            _sessionDictionary.TryAdd(e.SessionHandle.ServerSequenceId, e.SessionHandle);
+
             if (ConnectedSessionEvent != null)
                 ConnectedSessionEvent(this, new ConnectedSessionEventArgs(e.SessionHandle));
 
@@ -218,6 +248,7 @@ namespace Laika.Net
         private Acceptor _acceptor;
         private Receiver _receiver;
         private Sender _sender;
+        private ConcurrentDictionary<long, Session> _sessionDictionary = new ConcurrentDictionary<long, Session>();
 
         public event ReceiveHandle ReceivedMessageFromSession;
         public event ErrorHandle OccurredError;

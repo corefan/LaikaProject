@@ -79,6 +79,7 @@ namespace Laika.Net
         internal ConcurrentQueue<byte[]> SendQueue = new ConcurrentQueue<byte[]>();
         internal SendContext Context = new SendContext();
         internal bool SetArgsCompleted { get; set; }
+        internal DateTime LastReceivedTime { get; set; }
 
         private bool _disposed = false;
         private bool _sending = false;
