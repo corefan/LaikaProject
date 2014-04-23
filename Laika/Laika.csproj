@@ -102,6 +102,7 @@
     <Compile Include="EventHandler\LaikaEventHandler.cs" />
     <Compile Include="Network\NetworkUtility.cs" />
     <Compile Include="Net\ILaikaClient.cs" />
+    <Compile Include="Net\ILaikaNet.cs" />
     <Compile Include="Net\ILaikaServer.cs" />
     <Compile Include="Net\Session.cs" />
     <Compile Include="Pools\ObjectPooling.cs" />

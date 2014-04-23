@@ -111,7 +111,7 @@ namespace Laika.Net
 
         private void InitializeReceiver()
         {
-            _receiver = new Receiver<messageT, headerT, bodyT>();
+            _receiver = new Receiver(this);
             _receiver.ReceivedMessage += ReceivedMessage;
             _receiver.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _receiver.DisconnectedSession += DisconnectedSession;
@@ -148,7 +148,7 @@ namespace Laika.Net
         }
         private void InitializeSender()
         {
-            _sender = new Sender<messageT, headerT, bodyT>();
+            _sender = new Sender();
             _sender.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _sender.DisconnectedSession += DisconnectedSession;
             _sender.EventCompletedSendData += EventCompletedSendDataProc;
@@ -203,13 +203,21 @@ namespace Laika.Net
             }
         }
 
+        public IMessage MessageFactory()
+        {
+            IMessage message = new messageT();
+            message.Header = new headerT();
+            message.Body = new bodyT();
+            return message;
+        }
+
         private IPEndPoint _endPoint;
         private Socket _listenerSocket;
         private ManualResetEvent _serverWait = new ManualResetEvent(false);
         private bool _disposed = false;
         private Acceptor _acceptor;
-        private Receiver<messageT, headerT, bodyT> _receiver;
-        private Sender<messageT, headerT, bodyT> _sender;
+        private Receiver _receiver;
+        private Sender _sender;
 
         public event ReceiveHandle ReceivedMessageFromSession;
         public event ErrorHandle OccurredError;

@@ -5,7 +5,7 @@ using Laika.Net.Message;
 
 namespace Laika.Net
 {
-    public interface ILaikaServer : IDisposable
+    public interface ILaikaServer : IDisposable, ILaikaNet
     {
         void NonblockingStart();
         void BlockingStart();
@@ -13,6 +13,7 @@ namespace Laika.Net
         void SendMessageAsync(Session session, IMessage message);
         void SendMessageAsync(IEnumerable<Session> sessionList, IMessage message);
         void ReleaseBlocking();
+        
         event ReceiveHandle ReceivedMessageFromSession;
         event ErrorHandle OccurredError;
         event ConnectHandle ConnectedSessionEvent;

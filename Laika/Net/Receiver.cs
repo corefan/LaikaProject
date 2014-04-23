@@ -6,37 +6,37 @@ using Laika.Net.Body;
 
 namespace Laika.Net
 {
-    internal class Receiver<messageT, headerT, bodyT>
-        where messageT : class, IMessage, new()
-        where headerT : class, IHeader, new()
-        where bodyT : class, IBody, new()
+    internal class Receiver
     {
         internal event ReceiveHandle ReceivedMessage;
         internal event ExceptionSessionHandle OccurredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
+        private ILaikaNet _net;
+        internal Receiver(ILaikaNet net)
+        {
+            _net = net;
+        }
 
         internal void ReceiveAsync(Session session)
         {
             if (session == null || session.Handle == null)
                 return;
 
-            //SocketAsyncEventArgs receiveEventArg = null;
             try
             {
-                //receiveEventArg = new SocketAsyncEventArgs();
-                messageT message = new messageT();
+                IMessage message = _net.MessageFactory();
+
                 message.Session = session;
-                message.Header = new headerT();
                 message.Header.HeaderRawData = new byte[message.Header.GetHeaderSize()];
                 session.ReceiveEventArgs.UserToken = message;
                 session.ReceiveEventArgs.SetBuffer(message.Header.HeaderRawData, 0, message.Header.HeaderRawData.Length);
                 session.ReceiveEventArgs.Completed += ReceiveHeaderCompleted;
 
-                session.Handle.ReceiveAsync(session.ReceiveEventArgs);
+                if (session.Handle.ReceiveAsync(session.ReceiveEventArgs) == false)
+                    ReceiveHeaderCompleted(session.Handle, session.ReceiveEventArgs);
             }
             catch (Exception ex)
             {
-                //CleanArgument(receiveEventArg);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
@@ -44,7 +44,7 @@ namespace Laika.Net
 
         private void ReceiveHeaderCompleted(object sender, SocketAsyncEventArgs e)
         {
-            messageT message = e.UserToken as messageT;
+            IMessage message = e.UserToken as IMessage;
             Session session = message.Session;
             try
             {
@@ -59,18 +59,17 @@ namespace Laika.Net
                     if (DisconnectedSession != null)
                         DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
-                    //CleanArgument(e);
                     return;
                 }
                 else if (message.Header.BytesTransferred < message.Header.GetHeaderSize())
                 {
                     e.SetBuffer(message.Header.HeaderRawData, message.Header.BytesTransferred, message.Header.GetHeaderSize() - message.Header.BytesTransferred);
 
-                    session.Handle.ReceiveAsync(e);
+                    if (session.Handle.ReceiveAsync(e) == false)
+                        ReceiveHeaderCompleted(session.Handle, e);
                 }
                 else if (message.Header.BytesTransferred == message.Header.GetHeaderSize())
                 {
-                    message.Body = new bodyT();
                     message.Header.ContentsSize = BitConverter.ToInt32(message.Header.HeaderRawData, 0);
                     if (message.Header.ContentsSize <= 0 || message.Header.ContentsSize > LaikaConfig.MaxBodySize)
                         throw new ArgumentException(string.Format("Invalid Body Size, Size : {0}", message.Header.ContentsSize));
@@ -81,17 +80,16 @@ namespace Laika.Net
                     e.Completed -= ReceiveHeaderCompleted;
                     e.Completed += ReceiveBodyCompleted;
 
-                    session.Handle.ReceiveAsync(e);
+                    if (session.Handle.ReceiveAsync(e) == false)
+                        ReceiveBodyCompleted(session.Handle, e);
                 }
                 else
                 {
-                    //CleanArgument(e);
                     throw new ArgumentException();
                 }
             }
             catch (Exception ex)
             {
-                //CleanArgument(e);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
@@ -99,7 +97,7 @@ namespace Laika.Net
 
         private void ReceiveBodyCompleted(object sender, SocketAsyncEventArgs e)
         {
-            messageT message = e.UserToken as messageT;
+            IMessage message = e.UserToken as IMessage;
             Session session = message.Session;
             try
             {
@@ -114,18 +112,17 @@ namespace Laika.Net
                     if (DisconnectedSession != null)
                         DisconnectedSession(this, new DisconnectSocketEventArgs(session));
                     
-                    //CleanArgument(e);
                     return;
                 }
                 else if (message.Body.BytesTransferred < message.Header.ContentsSize)
                 {
                     e.SetBuffer(message.Body.BodyRawData, message.Body.BytesTransferred, message.Header.ContentsSize - message.Body.BytesTransferred);
 
-                    session.Handle.ReceiveAsync(e);
+                    if (session.Handle.ReceiveAsync(e) == false)
+                        ReceiveBodyCompleted(session.Handle, e);
                 }
                 else if (message.Body.BytesTransferred == message.Header.ContentsSize)
                 {
-                    //CleanArgument(e);
                     e.Completed -= ReceiveBodyCompleted;
                     if (ReceivedMessage != null)
                         ReceivedMessage(this, new ReceivedMessageEventArgs(message));
@@ -134,25 +131,14 @@ namespace Laika.Net
                 }
                 else
                 {
-                    //CleanArgument(e);
                     throw new SocketException();
                 }
             }
             catch (Exception ex)
             {
-                //CleanArgument(e);
                 if (OccurredExceptionFromSession != null)
                     OccurredExceptionFromSession(this, new ExceptionFromSessionEventArgs(session, ex));
             }
         }
-
-        //private void CleanArgument(SocketAsyncEventArgs e)
-        //{
-        //    if (e != null)
-        //    {
-        //        e.Dispose();
-        //        e = null;
-        //    }
-        //}
     }
 }

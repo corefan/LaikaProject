@@ -15,7 +15,8 @@ namespace Laika.Net
             e.RemoteEndPoint = endPoint;
             e.Completed += ConnectCompleted;
             e.UserToken = session;
-            session.Handle.ConnectAsync(e);
+            if (session.Handle.ConnectAsync(e) == false)
+                ConnectCompleted(session.Handle, e);
         }
 
         private void ConnectCompleted(object sender, SocketAsyncEventArgs e)

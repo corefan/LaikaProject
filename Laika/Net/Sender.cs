@@ -9,61 +9,81 @@ using Laika.Net.Body;
 
 namespace Laika.Net
 {
-    internal class Sender<messageT, headerT, bodyT>
-        where messageT : class, IMessage, new()
-        where headerT : class, IHeader, new()
-        where bodyT : class, IBody, new()
+    internal class Sender
     {
         private void SendMessageToSocketAsync(Session session, byte[] sendData)
         {
-            SendContext context = new SendContext();
-            context.SendData = sendData;
-            context.Session = session;
+            session.SendQueue.Enqueue(sendData);
 
-            SocketAsyncEventArgs e = new SocketAsyncEventArgs();
-            e.SetBuffer(context.SendData, 0, context.SendData.Length);
-            e.UserToken = context;
-            e.Completed += SendCompleted;
+            if (session.NeedSendingProcedure() == false)
+                return;
 
-            session.Handle.SendAsync(e);
+            Task.Factory.StartNew(() => 
+            {
+                SendToSession(session);
+            });
+        }
+
+        private void SendToSession(Session session)
+        {
+            byte[] data;
+            if (session.SendQueue.TryDequeue(out data) == false)
+            {
+                session.EndSend();
+                return;
+            }
+
+            session.Context.SendData = data;
+
+            session.SendEventArgs.SetBuffer(session.Context.SendData, 0, session.Context.SendData.Length);
+            if (session.SetArgsCompleted == false)
+            {
+                session.SendEventArgs.UserToken = session;
+                session.SendEventArgs.Completed += SendCompleted;
+                session.SetArgsCompleted = true;
+            }
+
+            if (session.Handle.SendAsync(session.SendEventArgs) == false)
+                SendCompleted(session.Handle, session.SendEventArgs);
         }
 
         private void SendCompleted(object sender, SocketAsyncEventArgs e)
         {
-            SendContext context = e.UserToken as SendContext;
-            Session session = context.Session;
+            Session session = e.UserToken as Session;
             try
             {
                 if (session.Handle == null)
                     throw new ArgumentNullException();
 
                 int bytesTransferred = e.BytesTransferred;
-                context.BytesTransferred += bytesTransferred;
+                session.Context.BytesTransferred += bytesTransferred;
 
                 if (bytesTransferred <= 0)
                 {
                     if (DisconnectedSession != null)
                         DisconnectedSession(this, new DisconnectSocketEventArgs(session));
 
-                    CleanArgument(e, context);
+                    CleanArgument(e, session.Context);
                     return;
                 }
-                else if (context.BytesTransferred < context.SendData.Length)
+                else if (session.Context.BytesTransferred < session.Context.SendData.Length)
                 {
-                    e.UserToken = context;
-                    e.SetBuffer(context.SendData, context.BytesTransferred, context.SendData.Length - context.BytesTransferred);
+                    e.UserToken = session;
+                    e.SetBuffer(session.Context.SendData, session.Context.BytesTransferred, session.Context.SendData.Length - session.Context.BytesTransferred);
 
-                    session.Handle.SendAsync(e);
+                    if (session.Handle.SendAsync(e) == false)
+                        SendCompleted(session.Handle, e);
                 }
-                else if (context.BytesTransferred == context.SendData.Length)
+                else if (session.Context.BytesTransferred == session.Context.SendData.Length)
                 {
                     if (EventCompletedSendData != null)
                         EventCompletedSendData(this, new SendMessageEventArgs(session));
-                    CleanArgument(e, context);
+                    CleanArgument(e, session.Context);
+                    SendToSession(session);
                 }
                 else
                 {
-                    CleanArgument(e, context);
+                    CleanArgument(e, session.Context);
                     throw new SocketException();
                 }
             }
@@ -74,31 +94,23 @@ namespace Laika.Net
             }
         }
 
-        private void CleanArgument(SocketAsyncEventArgs e, SendContext context)
+        private void CleanArgument(SocketAsyncEventArgs e, Session.SendContext context)
         {
             if (e != null)
             {
-                e.Dispose();
-                e = null;
+                e.SetBuffer(null, 0, 0);
             }
 
             if (context != null)
             {
+                context.BytesTransferred = 0;
                 context.SendData = null;
-                context = null;
             }
         }
 
         internal event ExceptionSessionHandle OccurredExceptionFromSession;
         internal event DisconnectedSocketHandle DisconnectedSession;
         internal event SendCompletedHandle EventCompletedSendData;
-
-        internal class SendContext
-        {
-            internal int BytesTransferred { get; set; }
-            internal byte[] SendData { get; set; }
-            internal Session Session { get; set; }
-        }
 
         internal void SendAsync(Session session, IMessage message)
         {

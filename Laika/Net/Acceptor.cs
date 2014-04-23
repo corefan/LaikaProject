@@ -21,7 +21,8 @@ namespace Laika.Net
             acceptArgs.Completed += AcceptCompleted;
             try
             {
-                _acceptingSocket.AcceptAsync(acceptArgs);
+                if (_acceptingSocket.AcceptAsync(acceptArgs) == false)
+                    AcceptCompleted(_acceptingSocket, acceptArgs);
             }
             catch (Exception ex)
             {

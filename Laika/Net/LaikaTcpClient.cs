@@ -35,6 +35,14 @@ namespace Laika.Net
             _sender.SendAsync(_session, message);
         }
 
+        public IMessage MessageFactory()
+        {
+            IMessage message = new messageT();
+            message.Header = new headerT();
+            message.Body = new bodyT();
+            return message;
+        }
+
         private void InitializeClient()
         {
             _session = new Session();
@@ -46,7 +54,7 @@ namespace Laika.Net
 
         private void InitializeReceiver()
         {
-            _receiver = new Receiver<messageT, headerT, bodyT>();
+            _receiver = new Receiver(this);
             _receiver.DisconnectedSession += DisconnectedSession;
             _receiver.OccurredExceptionFromSession += OccurredExceptionFromSession;
             _receiver.ReceivedMessage += ReceivedMessageFromServer;
@@ -77,7 +85,7 @@ namespace Laika.Net
                                 
         private void InitializeSender()
         {
-            _sender = new Sender<messageT, headerT, bodyT>();
+            _sender = new Sender();
             _sender.DisconnectedSession += DisconnectedSession;
             _sender.OccurredExceptionFromSession += OccurredExceptionFromSession;
         }
@@ -138,8 +146,8 @@ namespace Laika.Net
         private ManualResetEvent _clientWait = new ManualResetEvent(false);
         private ManualResetEvent _connectWait = new ManualResetEvent(false);
         private Connector _connector;
-        private Sender<messageT, headerT, bodyT> _sender;
-        private Receiver<messageT, headerT, bodyT> _receiver;
+        private Sender _sender;
+        private Receiver _receiver;
 
         public event DisconnectedSocketHandle DisconnectedSessionEvent;
         public event SocketExceptionHandle OccurredException;
