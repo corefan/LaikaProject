@@ -73,7 +73,7 @@ namespace Laika.Net
         }
 
         public Socket Handle { get; internal set; }
-        public long ServerSequenceId { get; internal set; }
+        public long UniqueId { get; internal set; }
         internal SocketAsyncEventArgs ReceiveEventArgs { get; set; }
         internal SocketAsyncEventArgs SendEventArgs { get; set; }
         internal ConcurrentQueue<byte[]> SendQueue = new ConcurrentQueue<byte[]>();

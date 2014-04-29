@@ -111,7 +111,7 @@ namespace Laika.Net
             foreach (var s in sessions)
             {
                 Session session;
-                _sessionDictionary.TryRemove(s.ServerSequenceId, out session);
+                _sessionDictionary.TryRemove(s.UniqueId, out session);
                 session.Dispose();
             }
         }
@@ -139,7 +139,7 @@ namespace Laika.Net
         private void DisconnectedSession(object sender, DisconnectSocketEventArgs e)
         {
             Session session;
-            _sessionDictionary.TryRemove(e.SessionHandle.ServerSequenceId, out session);
+            _sessionDictionary.TryRemove(e.SessionHandle.UniqueId, out session);
 
             if (Disconnect != null)
             {
@@ -155,7 +155,7 @@ namespace Laika.Net
         private void OccurredExceptionFromSession(object sender, ExceptionFromSessionEventArgs e)
         {
             Session session;
-            _sessionDictionary.TryRemove(e.SessionHandle.ServerSequenceId, out session);
+            _sessionDictionary.TryRemove(e.SessionHandle.UniqueId, out session);
 
             if (OccurredError != null)
                 OccurredError(this, new ExceptionEventArgs(e.SessionHandle, e.Exception));
@@ -198,7 +198,7 @@ namespace Laika.Net
         private void ConnectedSession(object sender, AcceptEventArgs e)
         {
             e.SessionHandle.LastReceivedTime = DateTime.Now;
-            _sessionDictionary.TryAdd(e.SessionHandle.ServerSequenceId, e.SessionHandle);
+            _sessionDictionary.TryAdd(e.SessionHandle.UniqueId, e.SessionHandle);
 
             if (ConnectedSessionEvent != null)
                 ConnectedSessionEvent(this, new ConnectedSessionEventArgs(e.SessionHandle));

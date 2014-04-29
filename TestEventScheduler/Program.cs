@@ -13,6 +13,68 @@ namespace TestEventScheduler
         static void Main(string[] args)
         {
             TestEvent();
+            //TestPerformance1();
+            //TestPerformance2();
+            //ManualResetEvent mre = new ManualResetEvent(false);
+            //mre.WaitOne();
+        }
+
+        private static void TestPerformance1()
+        {
+            Laika.ThreadPoolManager.AppDomainThreadPoolManager.SetMinThreadPool(200, 200);
+            EventScheduler es = new EventScheduler();
+            int i = 10000;
+            while (true)
+            {
+                try
+                {
+                    es.AddEvent(
+                        (i++).ToString(),
+                        new Event().Every(new TimeSpan(0, 0, 1)).StartAt(new TimeSpan(0, 0, 1)).MaxRuns(10),
+                        new Action(() =>
+                        {
+                            //Console.WriteLine("hello");
+                        }));
+
+                    //System.Threading.Thread.Sleep(50);
+                    if (i > 19999)
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    System.Diagnostics.Debugger.Break();
+                }
+            }
+        }
+
+        private static void TestPerformance2()
+        {
+            Laika.ThreadPoolManager.AppDomainThreadPoolManager.SetMinThreadPool(200, 200);
+            EventScheduler es = new EventScheduler();
+            int i = 0;
+            while (true)
+            {
+                try
+                {
+                    es.AddEvent(
+                        (i++).ToString(),
+                        new Event().Every(new TimeSpan(0, 0, 1)).StartAt(new TimeSpan(0, 0, 1)).MaxRuns(10),
+                        new Action(() =>
+                        {
+                            //Console.WriteLine("hello");
+                        }));
+
+                    //System.Threading.Thread.Sleep(50);
+                    if (i > 9999)
+                        break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    System.Diagnostics.Debugger.Break();
+                }
+            }
         }
 
         private static void TestEvent()
@@ -23,14 +85,15 @@ namespace TestEventScheduler
                 MaxRuns(10).
                 StartAt(new TimeSpan(0, 0, 1)).
                 StopAt(new TimeSpan(0, 0, 5)).
-                Every(new TimeSpan(0, 0, 1)),
+                Every(new TimeSpan(0, 0, 1)).MaxRuns(3),
                 () => { Console.WriteLine("hello"); }
                 );
 
-            ManualResetEvent mre = new ManualResetEvent(false);
-            mre.WaitOne();
+            Console.ReadKey();
+            //ManualResetEvent mre = new ManualResetEvent(false);
+            //mre.WaitOne();
 
-            es.RemoveEvent("hello");
+            //es.RemoveEvent("hello");
             es.Dispose();
         }
     }

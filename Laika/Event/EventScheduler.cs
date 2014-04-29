@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 
 namespace Laika.Event
 {
@@ -10,6 +11,12 @@ namespace Laika.Event
     /// </summary>
     public class EventScheduler : IDisposable
     {
+        public EventScheduler()
+        {
+            _workerThread = new Thread(DoJob);
+            _workerThread.Start();
+        }
+
         ~EventScheduler()
         {
             Dispose(false);
@@ -35,13 +42,9 @@ namespace Laika.Event
 
         private void Clear()
         {
-            lock (_disposeLock)
-            {
-                List<TaskService> list = _taskTable.Values.ToList();
-                list.ForEach(x=>x.Dispose());
-                list.Clear();
-                _taskTable.Clear();
-            }
+            _taskTable.Clear();
+            _run = false;
+            _workerThread.Join();
         }
         /// <summary>
         /// 이벤트 삭제
@@ -53,7 +56,7 @@ namespace Laika.Event
             TaskService ts = null;
             bool result = _taskTable.TryRemove(eventName, out ts);
             if (result == true)
-                ts.Dispose();
+                Interlocked.Decrement(ref _currentCount);
             return result;
         }
         /// <summary>
@@ -62,22 +65,45 @@ namespace Laika.Event
         /// <param name="eventName">이벤트 이름</param>
         /// <param name="eventTask">이벤트 설정</param>
         /// <param name="executeMethod">실행 메소드</param>
-        /// <returns></returns>
+        /// <returns>스케쥴러에 10,000개의 이벤트가 있으면 추가 실패로 false가 return 됨.</returns>
         public bool AddEvent(string eventName, Event eventTask, Action executeMethod)
         {
+            if (_maxTaskCount <= _currentCount)
+                return false;
+
             TaskService ts = new TaskService(eventName, eventTask, executeMethod);
             ts.EndEvent += EndTask;
+            Interlocked.Increment(ref _currentCount);
             return _taskTable.TryAdd(eventName, ts);
         }
 
         private void EndTask(object sender, TaskServiceEndEventArgs e)
         {
             TaskService ts = null;
-            _taskTable.TryRemove(e.TaskServiceName, out ts);
+            bool result = _taskTable.TryRemove(e.TaskServiceName, out ts);
+            if (result == true)
+                Interlocked.Decrement(ref _currentCount);
         }
 
-        private object _disposeLock = new object();
         private bool _disposed = false;
+        private bool _run = true;
         private ConcurrentDictionary<string, TaskService> _taskTable = new ConcurrentDictionary<string, TaskService>();
+        private Thread _workerThread = null;
+        private const int _maxTaskCount = 10000;
+        private int _currentCount = 0;
+        private void DoJob(object obj)
+        {
+            while (_run)
+            {
+                List<TaskService> taskList = _taskTable.Values.ToList();
+                
+                foreach (var task in taskList)
+                {
+                    task.DoTask(null);
+                }
+                System.Threading.Thread.Sleep(10);
+
+            }
+        }
     }
 }

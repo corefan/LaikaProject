@@ -1,53 +1,26 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Laika.Event
 {
-    internal class TaskService : IDisposable
+    internal class TaskService
     {
         internal TaskService(string name, Event eventInstance, Action task)
         {
             _taskName = name;
             _event = eventInstance;
             _task = task;
-
-            _timer = new Timer(DoTask);
-            _timer.Change(eventInstance.DueTime, eventInstance.Interval);
+            _runTime = DateTime.MinValue;
         }
 
-        ~TaskService()
+        internal void DoTask(object state)
         {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed == true)
+            DateTime reference = DateTime.Now;
+            if (reference < _event.StartTime)
                 return;
 
-            if (disposing == true)
-                Clear();
-
-            _disposed = true;
-        }
-
-        private void Clear()
-        {
-            _timer.Dispose();
-        }
-
-        private void DoTask(object state)
-        {
-            if (DateTime.Now < _event.StartTime)
-                return;
-
-            if (DateTime.Now > _event.EndTime)
+            if (reference > _event.EndTime)
             {
                 EndTask();
                 return;
@@ -59,7 +32,12 @@ namespace Laika.Event
                 return;
             }
 
-            _task();
+            if (reference < _runTime.Add(_event.Interval))
+                return;
+
+            Task.Factory.StartNew(_task);
+
+            _runTime = reference;
             _runCount++;
         }
 
@@ -67,17 +45,14 @@ namespace Laika.Event
         {
             if (EndEvent != null)
                 EndEvent(this, new TaskServiceEndEventArgs(_taskName));
-
-            Dispose();
         }
 
         private string _taskName;
         private Event _event;
         private Action _task;
-        private Timer _timer;
         private int _runCount;
+        private DateTime _runTime;
 
         public event EndEventHandler EndEvent;
-        private bool _disposed = false;
     }
 }

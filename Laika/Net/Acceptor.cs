@@ -15,7 +15,7 @@ namespace Laika.Net
         internal void NewAccept()
         {
             Session session = new Session();
-            session.ServerSequenceId = Laika.UIDGen.UniqueIDGenerator.GetID();
+            session.UniqueId = Laika.UIDGen.UniqueIDGenerator.GetID();
             SocketAsyncEventArgs acceptArgs = new SocketAsyncEventArgs();
             acceptArgs.UserToken = session;
             acceptArgs.Completed += AcceptCompleted;
