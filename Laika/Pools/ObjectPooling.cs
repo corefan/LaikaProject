@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 
 namespace Laika.Pools
 {
-    public class ObjectPooling<T> : Queue<Instance<T>>, IDisposable
+    public class ObjectPooling<T> : ConcurrentQueue<Instance<T>>, IDisposable
             where T : IDisposable, new()
     {
         public ObjectPooling()
@@ -13,9 +14,22 @@ namespace Laika.Pools
         { }
 
         public ObjectPooling(int capacity)
+            : this(capacity, () => { return new T(); })
+        { }
+
+        public ObjectPooling(int capacity, Func<T> generateObjectFunc)
+        {
+            Initializer(capacity, generateObjectFunc);
+        }
+
+        private void Initializer(int capacity, Func<T> generateObjectFunc)
         {
             _capacity = capacity;
-            EnqueueObject();
+            _generateObjectFunc = generateObjectFunc;
+            for (int i = 0; i < _capacity; i++)
+            {
+                this.Enqueue(new Instance<T>(this, _generateObjectFunc));
+            }
         }
 
         ~ObjectPooling()
@@ -42,52 +56,46 @@ namespace Laika.Pools
 
         private void ClearInstance()
         {
-            foreach (var i in this)
+            Instance<T> obj;
+            while (this.TryDequeue(out obj))
             {
-                i.Dispose();
-                this.Clear();
-            }
-        }
-
-        private void EnqueueObject()
-        {
-            for (int i = 0; i < _capacity; i++)
-            {
-                this.Enqueue(new Instance<T>(this));
+                obj.Dispose();
             }
         }
 
         public Instance<T> Get()
         {
-            lock (_lockQueue)
-            {
-                if (this.Count > 0)
-                    return this.Dequeue();
+            Instance<T> obj;
+            if (this.TryDequeue(out obj) == false)
+                return new Instance<T>(_generateObjectFunc);
 
-                else return new Instance<T>();
-            }
+            return obj;
         }
         internal void EnqueueInstance(Instance<T> instance)
         {
-            lock (_lockQueue)
-            {
-                this.Enqueue(instance);
-            }
+            this.Enqueue(instance);
         }
 
         private bool _disposed = false;
-        private object _lockQueue = new object();
         private int _capacity;
+        private Func<T> _generateObjectFunc = null;
         public const int DefaultPoolSize = 10;
     }
 
     public class Instance<T> : IDisposable
         where T : IDisposable, new()
     {
-        internal Instance()
-            : this(null)
+        internal Instance(Func<T> generateFunc)
+            : this(null, generateFunc)
         {
 
+        }
+
+        internal Instance(ObjectPooling<T> master, Func<T> generateFunc)
+        {
+            _master = master;
+            _generateObject = generateFunc;
+            PooledObject = _generateObject();
         }
 
         ~Instance()
@@ -131,14 +139,9 @@ namespace Laika.Pools
             PooledObject.Dispose();
         }
 
-        internal Instance(ObjectPooling<T> master)
-        {
-            _master = master;
-            PooledObject = new T();
-        }
-
         private bool _disposed = false;
         private ObjectPooling<T> _master = null;
+        private Func<T> _generateObject = null;
         public T PooledObject { get; private set; }
     }
 }
