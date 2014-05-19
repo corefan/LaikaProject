@@ -9,7 +9,7 @@ namespace Laika.Net
     {
         void NonblockingStart();
         void BlockingStart();
-        Task SendMessage(Session session, IMessage message);
+        void SendMessage(Session session, IMessage message);
         void SendMessageAsync(Session session, IMessage message);
         void SendMessageAsync(IEnumerable<Session> sessionList, IMessage message);
         void ReleaseBlocking();

@@ -170,29 +170,26 @@ namespace Laika.Net
             });
         }
 
-        internal Task Send(Session session, IMessage message)
+        internal void Send(Session session, IMessage message)
         {
             if (CheckSession(session) == false)
-                return null;
+                return;
             if (CheckMessage(message) == false)
-                return null;
+                return;
 
             byte[] sendData = GetData(message);
-            return SendMessageToSocket(session, sendData, 0, sendData.Length);
+            SendMessageToSocket(session, sendData, 0, sendData.Length);
         }
 
-        private Task SendMessageToSocket(Session session, byte[] sendData, int offset, int size)
+        private void SendMessageToSocket(Session session, byte[] sendData, int offset, int size)
         {
-            return Task.Factory.StartNew(() => 
+            int bytesTransfferred = 0;
+            while (true)
             {
-                int bytesTransfferred = 0;
-                while (true)
-                {
-                    bytesTransfferred += session.Handle.Send(sendData, bytesTransfferred, sendData.Length - bytesTransfferred, SocketFlags.None);
-                    if (bytesTransfferred >= sendData.Length)
-                        break;
-                }
-            });
+                bytesTransfferred += session.Handle.Send(sendData, bytesTransfferred, sendData.Length - bytesTransfferred, SocketFlags.None);
+                if (bytesTransfferred >= sendData.Length)
+                    break;
+            }
         }
     }
 }

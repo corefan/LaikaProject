@@ -79,9 +79,9 @@ namespace Laika.Net
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        public Task SendMessage(Session session, IMessage message)
+        public void SendMessage(Session session, IMessage message)
         {
-            return _sender.Send(session, message);
+            _sender.Send(session, message);
         }
             
         public void SendMessageAsync(Session session, IMessage message)
