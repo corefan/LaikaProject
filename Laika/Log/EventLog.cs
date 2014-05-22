@@ -5,9 +5,9 @@ using Laika.ExtendBundle;
 
 namespace Laika.Log
 {
-    public class EventLog : IFileLog
+    public class EventLog : ILog
     {
-        private FileLogParameter _param;
+        private LogParameter _param;
         private bool _disposed = false;
 
         protected virtual void Dispose(bool disposing)
@@ -72,7 +72,7 @@ namespace Laika.Log
                     Console.WriteLine(message);
             });
         }
-        internal EventLog(FileLogParameter param)
+        internal EventLog(LogParameter param)
         {
             if (param == null)
                 throw new ArgumentNullException();

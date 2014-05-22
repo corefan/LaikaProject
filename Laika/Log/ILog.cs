@@ -5,7 +5,7 @@ namespace Laika.Log
     /// <summary>
     /// 파일 로그 인터페이스. FileLogFactory로 생성하며 스레드로 부터 안전함.
     /// </summary>
-    public interface IFileLog : IDisposable
+    public interface ILog : IDisposable
     {
         /// <summary>
         /// 일반 정보 기록

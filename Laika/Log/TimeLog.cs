@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 namespace Laika.Log
 {
-    class TimeLog : FileLog
+    class TimeLog : LaikaLog
     {
-        internal TimeLog(FileLogParameter param)
+        internal TimeLog(LogParameter param)
             : base (param)
         {
             _startTime = DateTime.Now;

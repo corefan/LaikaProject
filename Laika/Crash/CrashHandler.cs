@@ -8,8 +8,8 @@ namespace Laika.Crash
     /// </summary>
     public class CrashHandler
     {
-        private IFileLog _crashLog;
-        private FileLogParameter _parameter;
+        private ILog _crashLog;
+        private LogParameter _parameter;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -30,7 +30,7 @@ namespace Laika.Crash
         /// <param name="fileName">log file name prefix</param>
         public CrashHandler(string filePath, string fileName)
         {
-            _parameter = new FileLogParameter();
+            _parameter = new LogParameter();
             _parameter.Debug = true;
             _parameter.FileName = fileName;
             if(filePath != null)
@@ -53,7 +53,7 @@ namespace Laika.Crash
 
         private void CrashExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
-            _crashLog = FileLogFactory.CreateFileLog(_parameter);
+            _crashLog = LogFactory.CreateLogObject(_parameter);
             Exception ex = (Exception)e.ExceptionObject;
             _crashLog.FATAL_LOG("Exception Type [{0}]", ex.GetType().ToString());
             _crashLog.FATAL_LOG(ex.ToString());

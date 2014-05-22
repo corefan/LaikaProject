@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 namespace Laika.Log
 {
-    class SizeLog : FileLog
+    class SizeLog : LaikaLog
     {
-        internal SizeLog(FileLogParameter param)
+        internal SizeLog(LogParameter param)
             : base(param)
         {
         

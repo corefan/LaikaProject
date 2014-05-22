@@ -2,9 +2,9 @@
 
 namespace Laika.Log
 {
-    class NormalLog : FileLog
+    class NormalLog : LaikaLog
     {
-        internal NormalLog(FileLogParameter param)
+        internal NormalLog(LogParameter param)
             : base(param)
         { 
         
