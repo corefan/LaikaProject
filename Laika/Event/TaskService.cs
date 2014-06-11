@@ -35,7 +35,12 @@ namespace Laika.Event
             if (reference < _runTime.Add(_event.Interval))
                 return;
 
-            Task.Factory.StartNew(_task);
+            if (_run == true)
+                return;
+
+            _run = true;
+            var result = Task.Factory.StartNew(_task);
+            result.ContinueWith(x => _run = false);
 
             _runTime = reference;
             _runCount++;
@@ -47,6 +52,7 @@ namespace Laika.Event
                 EndEvent(this, new TaskServiceEndEventArgs(_taskName));
         }
 
+        private bool _run = false;
         private string _taskName;
         private Event _event;
         private Action _task;

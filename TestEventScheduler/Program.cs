@@ -8,18 +8,36 @@ using Laika.Event;
 
 namespace TestEventScheduler
 {
+    class Person
+    {
+        public int Index;
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            TestEvent();
+            TestInstance();
+            //TestEvent();
             //TestPerformance1();
             //TestPerformance2();
             //ManualResetEvent mre = new ManualResetEvent(false);
             //mre.WaitOne();
         }
 
-        private static void TestPerformance1()
+		private static void TestInstance()
+		{
+			EventScheduler es = new EventScheduler();
+			
+			for (int j = 0; j < 10; j++)
+			{
+				Person p = new Person() { Index = j };
+				es.AddEvent(j.ToString(), new Event().Every(new TimeSpan(0, 0, 0, 0, 100)).MaxRuns(2), () => { Console.WriteLine(p.Index); });
+			}
+
+			Console.ReadKey();
+		}
+
+		private static void TestPerformance1()
         {
             Laika.ThreadPoolManager.AppDomainThreadPoolManager.SetMinThreadPool(200, 200);
             EventScheduler es = new EventScheduler();
