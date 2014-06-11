@@ -54,10 +54,7 @@ namespace Laika.Event
         public bool RemoveEvent(string eventName)
         {
             TaskService ts = null;
-            bool result = _taskTable.TryRemove(eventName, out ts);
-            if (result == true)
-                Interlocked.Decrement(ref _currentCount);
-            return result;
+            return _taskTable.TryRemove(eventName, out ts);
         }
         /// <summary>
         /// 이벤트 추가
@@ -68,21 +65,19 @@ namespace Laika.Event
         /// <returns>스케쥴러에 10,000개의 이벤트가 있으면 추가 실패로 false가 return 됨.</returns>
         public bool AddEvent(string eventName, Event eventTask, Action executeMethod)
         {
-            if (_maxTaskCount <= _currentCount)
+            if (_maxTaskCount <= _taskTable.Count)
                 return false;
 
             TaskService ts = new TaskService(eventName, eventTask, executeMethod);
             ts.EndEvent += EndTask;
-            Interlocked.Increment(ref _currentCount);
+
             return _taskTable.TryAdd(eventName, ts);
         }
 
         private void EndTask(object sender, TaskServiceEndEventArgs e)
         {
             TaskService ts = null;
-            bool result = _taskTable.TryRemove(e.TaskServiceName, out ts);
-            if (result == true)
-                Interlocked.Decrement(ref _currentCount);
+            _taskTable.TryRemove(e.TaskServiceName, out ts);
         }
 
         private bool _disposed = false;
@@ -90,13 +85,13 @@ namespace Laika.Event
         private ConcurrentDictionary<string, TaskService> _taskTable = new ConcurrentDictionary<string, TaskService>();
         private Thread _workerThread = null;
         private const int _maxTaskCount = 10000;
-        private int _currentCount = 0;
+
         private void DoJob(object obj)
         {
             while (_run)
             {
                 List<TaskService> taskList = _taskTable.Values.ToList();
-                
+
                 foreach (var task in taskList)
                 {
                     task.DoTask(null);
