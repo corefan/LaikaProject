@@ -111,6 +111,7 @@ namespace Laika.Log
 				onlyTraceDebugMode = value;
 				UsingTrace = value;
 				Debug = value;
+				PrintConsole = value;
 			}
 		}
 		private bool onlyTraceDebugMode;
