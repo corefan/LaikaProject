@@ -22,6 +22,19 @@ namespace Laika.Diagnostics
             _initializeTime = DateTime.Now;
         }
 
+		public long Increment(long count)
+		{
+			if (_isPeriod == true && DateTime.Now >= _initializeTime + _initializeInterval)
+			{
+				_initializeTime = DateTime.Now;
+				_pastCount = Interlocked.Read(ref _count);
+				Interlocked.Exchange(ref _count, 0);
+				return Interlocked.Add(ref _count, count);
+			}
+
+			return Interlocked.Add(ref _count, count);
+		}
+
         public long Increment()
         {
             if (_isPeriod == true && DateTime.Now >= _initializeTime + _initializeInterval)
@@ -34,6 +47,19 @@ namespace Laika.Diagnostics
 
             return Interlocked.Increment(ref _count);
         }
+
+		public long Decrement(long count)
+		{
+			if (_isPeriod == true && DateTime.Now >= _initializeTime + _initializeInterval)
+			{
+				_initializeTime = DateTime.Now;
+				_pastCount = Interlocked.Read(ref _count);
+				Interlocked.Exchange(ref _count, 0);
+				return Interlocked.Add(ref _count, -count);
+			}
+
+			return Interlocked.Add(ref _count, -count);
+		}
 
         public long Decrement()
         {

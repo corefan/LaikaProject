@@ -91,7 +91,7 @@ namespace Laika.Event
             while (_run)
             {
                 List<TaskService> taskList = _taskTable.Values.ToList();
-
+                
                 foreach (var task in taskList)
                 {
                     task.DoTask(null);

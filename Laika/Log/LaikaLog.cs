@@ -68,7 +68,7 @@ namespace Laika.Log
 		}
 
 		protected abstract string GetFileName();
-		protected abstract bool NeedCreateFile(); 
+		protected abstract bool NeedCreateFile();
 
 		private void Initialize()
 		{
@@ -86,7 +86,7 @@ namespace Laika.Log
 			{
 				LogAppender += this.WriteTrace;
 			}
-			
+
 			_workerThread.Start();
 		}
 
@@ -147,7 +147,7 @@ namespace Laika.Log
 
 		~LaikaLog()
 		{
-			Dispose(false);    
+			Dispose(false);
 		}
 
 		public void Dispose()
@@ -189,7 +189,7 @@ namespace Laika.Log
 		}
 
 		private bool _disposed = false;
-		
+
 		private BlockingCollection<string> _logQueue = new BlockingCollection<string>();
 		private FileStream _logFileStream;
 		private StreamWriter _logStreamWriter;

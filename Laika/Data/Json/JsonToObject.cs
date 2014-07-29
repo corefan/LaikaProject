@@ -9,6 +9,16 @@ namespace Laika.Data.Json
     /// </summary>
     public class JsonToObject
     {
+		public JsonToObject()
+		{ 
+		
+		}
+
+		public void SetJsonData(string data)
+		{
+			_contents = data;
+		}
+
         /// <summary>
         /// 생성자
         /// </summary>
