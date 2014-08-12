@@ -12,7 +12,7 @@ namespace Laika.Web
         Application_ogg,
         Application_x_shockwave_flash,
         Application_json,
-        Application_x_www_form_urlencode,
+        Application_x_www_form_urlencoded,
         text_css,
         text_html,
         text_javascript,

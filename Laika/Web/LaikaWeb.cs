@@ -175,8 +175,8 @@ namespace Laika.Web
                 case ContentType.Application_json:
                     return "Application/json";
 
-                case ContentType.Application_x_www_form_urlencode:
-                    return "Application/x-www-form-urlencode";
+                case ContentType.Application_x_www_form_urlencoded:
+                    return "Application/x-www-form-urlencoded";
 
                 case ContentType.text_css:
                     return "text/css";
